@@ -1,0 +1,23 @@
+[package]
+name = "helios-cli"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+helios-core = { path = "../helios-core" }
+helios-parser = { path = "../helios-parser" }
+helios-detector = { path = "../helios-detector" }
+helios-ingest = { path = "../helios-ingest" }
+helios-enrichment = { path = "../helios-enrichment" }
+helios-storage = { path = "../helios-storage" }
+helios-api = { path = "../helios-api" }
+helios-parser-syslog = { path = "../parsers/helios-parser-syslog" }
+helios-parser-apache = { path = "../parsers/helios-parser-apache" }
+helios-parser-nginx = { path = "../parsers/helios-parser-nginx" }
+helios-parser-json = { path = "../parsers/helios-parser-json" }
+
+tokio.workspace = true
+clap.workspace = true
+tracing.workspace = true
+tracing-subscriber.workspace = true
+anyhow.workspace = true

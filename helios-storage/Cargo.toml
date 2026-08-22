@@ -1,0 +1,10 @@
+[package]
+name = "helios-storage"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+helios-core = { path = "../helios-core" }
+async-trait.workspace = true
+tokio.workspace = true
+anyhow.workspace = true

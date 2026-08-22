@@ -1,0 +1,12 @@
+[package]
+name = "helios-api"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+tracing.workspace = true
+axum.workspace = true
+tokio.workspace = true
+serde.workspace = true
+serde_json.workspace = true
+helios-core = { path = "../helios-core" }

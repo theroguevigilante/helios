@@ -1,0 +1,8 @@
+[package]
+name = "helios-parser"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+helios-core = { path = "../helios-core" }
+anyhow.workspace = true
