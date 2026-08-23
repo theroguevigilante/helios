@@ -418,8 +418,10 @@ dependencies = [
 name = "helios-parser-syslog"
 version = "0.1.0"
 dependencies = [
+ "chrono",
  "helios-core",
  "helios-parser",
+ "syslog_loose",
 ]
 
 [[package]]
@@ -613,6 +615,15 @@ dependencies = [
  "libc",
  "wasi",
  "windows-sys",
+]
+
+[[package]]
+name = "nom"
+version = "8.0.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "df9761775871bdef83bee530e60050f7e54b1105350d6884eb0fb4f46c2f9405"
+dependencies = [
+ "memchr",
 ]
 
 [[package]]
@@ -871,6 +882,16 @@ name = "sync_wrapper"
 version = "1.0.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "0bf256ce5efdfa370213c1dabab5935a12e49f2c58d15e9eac2870d3b4f27263"
+
+[[package]]
+name = "syslog_loose"
+version = "0.23.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "3ddbead3f86a91bd8c9b559ce0c5b0cbf03e774ffb7f8511eaf78375cc4a7837"
+dependencies = [
+ "chrono",
+ "nom",
+]
 
 [[package]]
 name = "thiserror"

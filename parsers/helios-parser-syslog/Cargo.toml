@@ -6,3 +6,5 @@ edition = "2021"
 [dependencies]
 helios-core = { path = "../../helios-core" }
 helios-parser = { path = "../../helios-parser" }
+syslog_loose = "0.23"
+chrono.workspace = true
