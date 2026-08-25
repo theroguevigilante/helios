@@ -3,6 +3,12 @@ use helios_parser::{Parser, ParserMetadata};
 
 pub struct NginxParser;
 
+impl Default for NginxParser {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 impl NginxParser {
     pub fn new() -> Self {
         Self

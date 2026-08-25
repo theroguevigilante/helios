@@ -13,11 +13,21 @@ pub struct EnrichmentPipeline {
     enrichers: Vec<Box<dyn Enricher>>,
 }
 
+impl Default for EnrichmentPipeline {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 impl EnrichmentPipeline {
     pub fn new() -> Self {
         Self {
             enrichers: Vec::new(),
         }
+    }
+
+    pub fn enrich(&self, event: &mut UniversalEvent) {
+        let _ = self.run(event);
     }
 
     pub fn add_enricher<E: Enricher + 'static>(&mut self, enricher: E) {

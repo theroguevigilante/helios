@@ -4,6 +4,12 @@ use serde_json::Value;
 
 pub struct JsonParser;
 
+impl Default for JsonParser {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 impl JsonParser {
     pub fn new() -> Self {
         Self
@@ -23,8 +29,10 @@ impl Parser for JsonParser {
         let value: Value = serde_json::from_str(raw)
             .map_err(|e| Error::ParseError(format!("Invalid JSON: {}", e)))?;
 
-        let mut event = UniversalEvent::default();
-        event.raw_event = raw.to_string();
+        let mut event = UniversalEvent {
+            raw_event: raw.to_string(),
+            ..Default::default()
+        };
 
         if let Some(obj) = value.as_object() {
             if let Some(msg) = obj.get("message").and_then(|v| v.as_str()) {

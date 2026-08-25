@@ -3,6 +3,12 @@ use helios_parser::{Parser, ParserMetadata};
 
 pub struct ApacheParser;
 
+impl Default for ApacheParser {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 impl ApacheParser {
     pub fn new() -> Self {
         Self
