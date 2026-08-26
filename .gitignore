@@ -7,3 +7,8 @@ node_modules/
 frontend/dist/
 *.tsbuildinfo
 
+
+# Frontend
+web/node_modules
+web/.svelte-kit
+web/build
