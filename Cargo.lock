@@ -338,6 +338,7 @@ dependencies = [
  "helios-parser-nginx",
  "helios-parser-syslog",
  "helios-storage",
+ "serde_json",
  "tokio",
  "tracing",
  "tracing-subscriber",
