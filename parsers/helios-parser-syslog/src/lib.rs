@@ -213,4 +213,3 @@ mod tests {
         assert_eq!(event.process.as_ref().and_then(|p| p.pid), Some(0));
     }
 }
-

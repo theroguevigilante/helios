@@ -68,8 +68,6 @@ async fn main() -> anyhow::Result<()> {
     registry.register(AndroidParser::new());
     registry.register(ProxifierParser::new());
 
-
-
     let detector = FormatDetector::new(&registry);
 
     match &cli.command {

@@ -18,8 +18,10 @@ static DETECT_RE: LazyLock<Regex> = LazyLock::new(|| {
 });
 
 static CAPTURE_RE: LazyLock<Regex> = LazyLock::new(|| {
-    Regex::new(r"^(\d{2}-\d{2} \d{2}:\d{2}:\d{2}\.\d{3})\s+(\d+)\s+(\d+)\s+([A-Za-z]+)\s+([^:]+):\s*(.*)$")
-        .expect("invalid capture regex")
+    Regex::new(
+        r"^(\d{2}-\d{2} \d{2}:\d{2}:\d{2}\.\d{3})\s+(\d+)\s+(\d+)\s+([A-Za-z]+)\s+([^:]+):\s*(.*)$",
+    )
+    .expect("invalid capture regex")
 });
 
 fn parse_timestamp(ts: &str) -> Option<DateTime<Utc>> {

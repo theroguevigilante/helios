@@ -22,6 +22,14 @@ The project is organized into modular Rust crates and a modern React frontend:
   - `helios-parser-json`: Structured JSON log parser.
   - `helios-parser-apache`: Apache Common/Combined access log parser.
   - `helios-parser-nginx`: Nginx access log parser.
+  - `helios-parser-cef`: Common Event Format (CEF) log parser.
+  - `helios-parser-zookeeper`: Apache ZooKeeper log parser.
+  - `helios-parser-spark`: Apache Spark log parser.
+  - `helios-parser-windows`: Windows CBS / application log parser.
+  - `helios-parser-android`: Android logcat (threadtime format) parser.
+  - `helios-parser-openssh`: OpenSSH authentication and server log parser.
+  - `helios-parser-proxifier`: Proxifier client proxy log parser.
+
 
 ---
 
@@ -151,6 +159,16 @@ npm run build
 
 ---
 
+## Citation
+
+The dataset is from loghub: 
++ **Loghub**: Jieming Zhu, Shilin He, Pinjia He, Jinyang Liu, Michael R. Lyu. [Loghub: A Large Collection of System Log Datasets for AI-driven Log Analytics](https://arxiv.org/abs/2008.06448). IEEE International Symposium on Software Reliability Engineering (ISSRE), 2023.
++ **Loghub-2.0**: Zhihan Jiang, Jinyang Liu, Junjie Huang, Yichen Li, Yintong Huo, Jiazhen Gu, Zhuangbin Chen, Jieming Zhu, Michael R. Lyu. [A Large-scale Evaluation for Log Parsing Techniques: How Far are We?](https://arxiv.org/abs/2308.10828). ACM SIGSOFT International Symposium on Software Testing and Analysis (ISSTA), 2024.
+
+
+---
+
 ## License
 
 MIT / Apache-2.0
+

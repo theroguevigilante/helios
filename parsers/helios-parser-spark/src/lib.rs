@@ -13,7 +13,8 @@ use regex::Regex;
 use std::sync::LazyLock;
 
 static DETECT_RE: LazyLock<Regex> = LazyLock::new(|| {
-    Regex::new(r"^\d{2}/\d{2}/\d{2} \d{2}:\d{2}:\d{2} [A-Za-z]+ \S+:").expect("invalid detect regex")
+    Regex::new(r"^\d{2}/\d{2}/\d{2} \d{2}:\d{2}:\d{2} [A-Za-z]+ \S+:")
+        .expect("invalid detect regex")
 });
 
 static CAPTURE_RE: LazyLock<Regex> = LazyLock::new(|| {

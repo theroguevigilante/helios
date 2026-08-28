@@ -76,8 +76,6 @@ pub fn create_router() -> Router {
     registry.register(AndroidParser::new());
     registry.register(ProxifierParser::new());
 
-
-
     let state = Arc::new(AppState {
         registry,
         enrichment: EnrichmentPipeline::new(),
