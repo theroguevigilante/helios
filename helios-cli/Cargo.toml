@@ -17,8 +17,15 @@ helios-parser-apache = { path = "../parsers/helios-parser-apache" }
 helios-parser-nginx = { path = "../parsers/helios-parser-nginx" }
 helios-parser-json = { path = "../parsers/helios-parser-json" }
 helios-parser-cef = { path = "../parsers/helios-parser-cef" }
+helios-parser-zookeeper = { path = "../parsers/helios-parser-zookeeper" }
+helios-parser-spark = { path = "../parsers/helios-parser-spark" }
+helios-parser-windows = { path = "../parsers/helios-parser-windows" }
+helios-parser-android = { path = "../parsers/helios-parser-android" }
+helios-parser-openssh = { path = "../parsers/helios-parser-openssh" }
+helios-parser-proxifier = { path = "../parsers/helios-parser-proxifier" }
 
 tokio.workspace = true
+
 clap.workspace = true
 tracing.workspace = true
 tracing-subscriber.workspace = true

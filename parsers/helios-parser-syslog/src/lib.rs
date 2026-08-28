@@ -199,4 +199,18 @@ mod tests {
         assert_eq!(event.hostname.unwrap(), "firewall1");
         assert_eq!(event.service.unwrap(), "%ASA-4-106023");
     }
+
+    #[test]
+    fn test_parse_mac_syslog() {
+        let parser = SyslogParser::new();
+        let raw = "Aug 28 10:23:45 macbook kernel[0]: message text";
+        assert!(parser.detect(raw));
+        let event = parser.parse(raw).unwrap();
+
+        assert_eq!(event.hostname.as_deref(), Some("macbook"));
+        assert_eq!(event.service.as_deref(), Some("kernel"));
+        assert_eq!(event.message, "message text");
+        assert_eq!(event.process.as_ref().and_then(|p| p.pid), Some(0));
+    }
 }
+

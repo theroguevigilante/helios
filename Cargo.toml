@@ -12,7 +12,14 @@ members = [
     "parsers/helios-parser-syslog",
     "parsers/helios-parser-apache",
     "parsers/helios-parser-nginx",
-    "parsers/helios-parser-json", "parsers/helios-parser-cef",
+    "parsers/helios-parser-json",
+    "parsers/helios-parser-cef",
+    "parsers/helios-parser-zookeeper",
+    "parsers/helios-parser-spark",
+    "parsers/helios-parser-windows",
+    "parsers/helios-parser-android",
+    "parsers/helios-parser-openssh",
+    "parsers/helios-parser-proxifier",
 ]
 
 [workspace.dependencies]

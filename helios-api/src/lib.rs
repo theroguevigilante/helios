@@ -9,10 +9,16 @@ use helios_core::UniversalEvent;
 use helios_detector::FormatDetector;
 use helios_enrichment::EnrichmentPipeline;
 use helios_parser::{ParserMetadata, Registry};
+use helios_parser_android::AndroidParser;
 use helios_parser_apache::ApacheParser;
 use helios_parser_json::JsonParser;
 use helios_parser_nginx::NginxParser;
+use helios_parser_openssh::OpenSshParser;
+use helios_parser_proxifier::ProxifierParser;
+use helios_parser_spark::SparkParser;
 use helios_parser_syslog::SyslogParser;
+use helios_parser_windows::WindowsParser;
+use helios_parser_zookeeper::ZooKeeperParser;
 use serde::{Deserialize, Serialize};
 use std::sync::Arc;
 use tower_http::cors::{Any, CorsLayer};
@@ -60,9 +66,17 @@ pub struct ErrorResponse {
 pub fn create_router() -> Router {
     let mut registry = Registry::new();
     registry.register(JsonParser::new());
+    registry.register(OpenSshParser::new());
     registry.register(SyslogParser::new());
     registry.register(ApacheParser::new());
     registry.register(NginxParser::new());
+    registry.register(ZooKeeperParser::new());
+    registry.register(SparkParser::new());
+    registry.register(WindowsParser::new());
+    registry.register(AndroidParser::new());
+    registry.register(ProxifierParser::new());
+
+
 
     let state = Arc::new(AppState {
         registry,

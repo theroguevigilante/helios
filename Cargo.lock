@@ -327,10 +327,16 @@ dependencies = [
  "helios-detector",
  "helios-enrichment",
  "helios-parser",
+ "helios-parser-android",
  "helios-parser-apache",
  "helios-parser-json",
  "helios-parser-nginx",
+ "helios-parser-openssh",
+ "helios-parser-proxifier",
+ "helios-parser-spark",
  "helios-parser-syslog",
+ "helios-parser-windows",
+ "helios-parser-zookeeper",
  "serde",
  "serde_json",
  "tokio",
@@ -350,11 +356,17 @@ dependencies = [
  "helios-enrichment",
  "helios-ingest",
  "helios-parser",
+ "helios-parser-android",
  "helios-parser-apache",
  "helios-parser-cef",
  "helios-parser-json",
  "helios-parser-nginx",
+ "helios-parser-openssh",
+ "helios-parser-proxifier",
+ "helios-parser-spark",
  "helios-parser-syslog",
+ "helios-parser-windows",
+ "helios-parser-zookeeper",
  "helios-storage",
  "serde_json",
  "tokio",
@@ -409,6 +421,16 @@ dependencies = [
 ]
 
 [[package]]
+name = "helios-parser-android"
+version = "0.1.0"
+dependencies = [
+ "chrono",
+ "helios-core",
+ "helios-parser",
+ "regex",
+]
+
+[[package]]
 name = "helios-parser-apache"
 version = "0.1.0"
 dependencies = [
@@ -451,6 +473,36 @@ dependencies = [
 ]
 
 [[package]]
+name = "helios-parser-openssh"
+version = "0.1.0"
+dependencies = [
+ "chrono",
+ "helios-core",
+ "helios-parser",
+ "regex",
+]
+
+[[package]]
+name = "helios-parser-proxifier"
+version = "0.1.0"
+dependencies = [
+ "chrono",
+ "helios-core",
+ "helios-parser",
+ "regex",
+]
+
+[[package]]
+name = "helios-parser-spark"
+version = "0.1.0"
+dependencies = [
+ "chrono",
+ "helios-core",
+ "helios-parser",
+ "regex",
+]
+
+[[package]]
 name = "helios-parser-syslog"
 version = "0.1.0"
 dependencies = [
@@ -458,6 +510,26 @@ dependencies = [
  "helios-core",
  "helios-parser",
  "syslog_loose",
+]
+
+[[package]]
+name = "helios-parser-windows"
+version = "0.1.0"
+dependencies = [
+ "chrono",
+ "helios-core",
+ "helios-parser",
+ "regex",
+]
+
+[[package]]
+name = "helios-parser-zookeeper"
+version = "0.1.0"
+dependencies = [
+ "chrono",
+ "helios-core",
+ "helios-parser",
+ "regex",
 ]
 
 [[package]]
