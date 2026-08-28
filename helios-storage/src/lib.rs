@@ -17,6 +17,12 @@ pub trait StorageBackend: Send + Sync {
 /// A stub for SQLite storage to be implemented later
 pub struct SqliteStorage {}
 
+impl Default for SqliteStorage {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 impl SqliteStorage {
     pub fn new() -> Self {
         Self {}

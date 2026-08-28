@@ -14,7 +14,9 @@ pub trait Parser: Send + Sync {
     fn metadata(&self) -> ParserMetadata;
 }
 
-#[derive(Debug, Clone)]
+use serde::{Deserialize, Serialize};
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct ParserMetadata {
     pub version: String,
     pub description: String,
@@ -23,6 +25,12 @@ pub struct ParserMetadata {
 
 pub struct Registry {
     parsers: Vec<Box<dyn Parser>>,
+}
+
+impl Default for Registry {
+    fn default() -> Self {
+        Self::new()
+    }
 }
 
 impl Registry {

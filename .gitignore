@@ -2,3 +2,13 @@
 **/*.rs.bk
 *.swp
 .DS_Store
+node_modules/
+**/node_modules/
+frontend/dist/
+*.tsbuildinfo
+
+
+# Frontend
+web/node_modules
+web/.svelte-kit
+web/build

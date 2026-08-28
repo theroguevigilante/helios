@@ -47,6 +47,12 @@ fn status_to_severity(status: u16) -> &'static str {
 
 pub struct ApacheParser;
 
+impl Default for ApacheParser {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 impl ApacheParser {
     pub fn new() -> Self {
         Self

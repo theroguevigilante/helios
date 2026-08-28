@@ -9,4 +9,12 @@ axum.workspace = true
 tokio.workspace = true
 serde.workspace = true
 serde_json.workspace = true
+tower-http = { workspace = true }
 helios-core = { path = "../helios-core" }
+helios-parser = { path = "../helios-parser" }
+helios-detector = { path = "../helios-detector" }
+helios-enrichment = { path = "../helios-enrichment" }
+helios-parser-json = { path = "../parsers/helios-parser-json" }
+helios-parser-syslog = { path = "../parsers/helios-parser-syslog" }
+helios-parser-apache = { path = "../parsers/helios-parser-apache" }
+helios-parser-nginx = { path = "../parsers/helios-parser-nginx" }
