@@ -16,6 +16,7 @@ helios-parser-syslog = { path = "../parsers/helios-parser-syslog" }
 helios-parser-apache = { path = "../parsers/helios-parser-apache" }
 helios-parser-nginx = { path = "../parsers/helios-parser-nginx" }
 helios-parser-json = { path = "../parsers/helios-parser-json" }
+helios-parser-cef = { path = "../parsers/helios-parser-cef" }
 
 tokio.workspace = true
 clap.workspace = true

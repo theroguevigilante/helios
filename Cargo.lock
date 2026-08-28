@@ -334,6 +334,7 @@ dependencies = [
  "helios-ingest",
  "helios-parser",
  "helios-parser-apache",
+ "helios-parser-cef",
  "helios-parser-json",
  "helios-parser-nginx",
  "helios-parser-syslog",
@@ -395,6 +396,16 @@ version = "0.1.0"
 dependencies = [
  "helios-core",
  "helios-parser",
+]
+
+[[package]]
+name = "helios-parser-cef"
+version = "0.1.0"
+dependencies = [
+ "chrono",
+ "helios-core",
+ "helios-parser",
+ "serde_json",
 ]
 
 [[package]]

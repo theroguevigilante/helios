@@ -1,6 +1,7 @@
 use clap::{Parser, Subcommand};
 use helios_detector::FormatDetector;
 use helios_parser::Registry;
+use helios_parser_cef::CefParser;
 use helios_parser_json::JsonParser;
 use helios_parser_syslog::SyslogParser;
 use std::fs::File;
@@ -47,9 +48,9 @@ async fn main() -> anyhow::Result<()> {
 
     // Initialize Registry and register parsers
     let mut registry = Registry::new();
+    registry.register(CefParser::new());
     registry.register(JsonParser::new());
     registry.register(SyslogParser::new());
-    // TODO: Register apache, nginx
 
     let detector = FormatDetector::new(&registry);
 
