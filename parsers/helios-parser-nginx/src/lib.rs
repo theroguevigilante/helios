@@ -52,12 +52,6 @@ fn status_to_severity(status: u16) -> &'static str {
 
 pub struct NginxParser;
 
-impl Default for NginxParser {
-    fn default() -> Self {
-        Self::new()
-    }
-}
-
 impl NginxParser {
     pub fn new() -> Self {
         Self

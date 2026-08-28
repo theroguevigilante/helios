@@ -59,12 +59,6 @@ impl ApacheParser {
     }
 }
 
-impl Default for ApacheParser {
-    fn default() -> Self {
-        Self::new()
-    }
-}
-
 impl Parser for ApacheParser {
     fn name(&self) -> &'static str {
         "apache"
