@@ -1,14 +1,14 @@
 # Helios
 
-**Helios** is a high-performance Universal Log Pre-processing & Observability Platform built in Rust with a modern React/TypeScript frontend. It automatically detects, parses, enriches, and normalizes unstructured and structured log formats into a unified event schema.
+**Helios** is a high-performance Universal Log Pre-processing & Observability Platform built in Rust with a modern SvelteKit frontend. It automatically detects, parses, enriches, and normalizes unstructured and structured log formats into a unified event schema.
 
 ---
 
 ## Workspace Structure
 
-The project is organized into modular Rust crates and a modern React frontend:
+The project is organized into modular Rust crates and a modern SvelteKit frontend:
 
-- **`frontend/`**: Interactive web dashboard and real-time log processing playground (React 19, Vite, Tailwind CSS, shadcn/ui).
+- **`web/`**: Interactive web dashboard and landing page (SvelteKit, Vite, Tailwind CSS v4, ECharts).
 - **`helios-core`**: Core data models (such as `UniversalEvent`) and shared types.
 - **`helios-parser`**: Parser traits, registry, and metadata definitions.
 - **`helios-detector`**: Automatic log format detection engine.
@@ -49,7 +49,7 @@ source "$HOME/.cargo/env"
 
 ### 2. Install Node.js & npm (for Frontend)
 
-Make sure [Node.js](https://nodejs.org/) (v18+) is installed.
+Make sure [Node.js](https://nodejs.org/) (v20+) is installed.
 
 ---
 
@@ -68,7 +68,7 @@ cargo run -p helios-cli -- serve --port 8080
 In a new terminal tab/window:
 
 ```bash
-cd frontend
+cd web
 npm install
 npm run dev
 ```
@@ -95,7 +95,7 @@ cargo run -p helios-cli -- parse -f <path-to-log-file>
 *When testing, you can redirect the output to a text file:*
 
 ```bash
-cargo run parse --file <input-log-file> > <output-file.txt>
+cargo run --p helios-cli parse --file <input-log-file> > <output-file.txt>
 ```
 
 #### 2. Format Detection Only
@@ -153,7 +153,7 @@ cargo fmt -- --check
 ### Build Frontend Bundle
 
 ```bash
-cd frontend
+cd web
 npm run build
 ```
 
@@ -171,4 +171,3 @@ The dataset is from loghub:
 ## License
 
 MIT / Apache-2.0
-

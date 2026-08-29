@@ -24,4 +24,5 @@ helios-parser-windows = { path = "../parsers/helios-parser-windows" }
 helios-parser-android = { path = "../parsers/helios-parser-android" }
 helios-parser-openssh = { path = "../parsers/helios-parser-openssh" }
 helios-parser-proxifier = { path = "../parsers/helios-parser-proxifier" }
+helios-parser-cef = { path = "../parsers/helios-parser-cef" }
 
