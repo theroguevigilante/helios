@@ -77,14 +77,6 @@
         >
           Open Dashboard →
         </a>
-        <a
-          href="https://github.com/theroguevigilante/helios"
-          target="_blank"
-          rel="noopener"
-          class="px-6 py-3 text-sm font-semibold transition border rounded-lg border-helios-border text-helios-text hover:bg-helios-surface-2"
-        >
-          View Source
-        </a>
       </div>
     </div>
 
