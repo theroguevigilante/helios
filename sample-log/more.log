@@ -1,0 +1,56 @@
+Jun 15 04:06:18 combo su(pam_unix)[21416]: session opened for user cyrus by (uid=0)
+17/06/09 20:10:41 INFO Remoting: Starting remoting
+Jun 15 04:06:19 combo su(pam_unix)[21416]: session closed for user cyrus
+Jun 15 04:06:20 combo logrotate: ALERT exited abnormally with [1]
+[Sun Dec 04 04:51:08 2005] [notice] jk2_init() Found child 6725 in scoreboard slot 10
+CEF:0|AcmeSecurity|Firewall|5.2|1001|User Login|5|src=192.168.1.42 suser=admin act=login outcome=success
+CEF:0|AcmeSecurity|IDS|5.2|2048|Port Scan Detected|8|src=10.0.0.25 dst=10.0.0.10 dpt=22 proto=TCP act=blocked
+Aug 28 21:14:07 server01 sshd[1842]: Accepted password for admin from 192.168.1.42 port 54321 ssh2
+CEF:0|AcmeSecurity|VPN|5.2|5021|VPN Login Failed|6|src=198.51.100.17 suser=john outcome=failure reason=invalid_password
+Jun 15 04:12:42 combo su(pam_unix)[22644]: session opened for user news by (uid=0)
+17/06/09 20:10:41 INFO spark.SecurityManager: Changing view acls to: yarn,curi
+[Sun Dec 04 04:51:52 2005] [notice] workerEnv.init() ok /etc/httpd/conf/workers2.properties
+{
+  "timestamp": "2026-08-28T21:11:42+05:30",
+  "level": "INFO",
+  "service": "api-server",
+  "request_id": "req_7f3a91c2",
+  "message": "Request processed successfully",
+  "status_code": 200,
+  "duration_ms": 143,
+  "user_id": "user_4821",
+  "metadata": {
+    "endpoint": "/api/v1/items",
+    "method": "GET",
+    "items_returned": 12
+  }
+}
+17/06/09 20:10:41 INFO spark.SecurityManager: Changing modify acls to: yarn,curi
+CEF:0|AcmeSecurity|Antivirus|5.2|3099|Malware Detected|10|src=172.16.0.45 fileName=invoice.exe threat=Trojan.Generic act=quarantine
+CEF:0|AcmeSecurity|Firewall|5.2|4012|Outbound Connection|4|src=192.168.1.55 dst=203.0.113.24 dpt=443 proto=TCP act=allowed
+{
+  "timestamp": "2026-08-28T21:11:42+05:30",
+  "level": "INFO",
+  "service": "api-server",
+  "request_id": "req_7f3a91c2",
+  "message": "Request processed successfully",
+  "status_code": 200,
+  "duration_ms": 143,
+  "user_id": "user_4821",
+  "metadata": {
+    "endpoint": "/api/v1/items",
+    "method": "GET",
+    "items_returned": 12
+  }
+}
+17/06/09 20:10:41 INFO spark.SecurityManager: SecurityManager: authentication disabled; ui acls disabled; users with view permissions: Set(yarn, curi); users with modify permissions: Set(yarn, curi)
+{
+  "timestamp": "2026-08-28T21:14:07+05:30",
+  "host": "server01",
+  "event_type": "authentication",
+  "username": "admin",
+  "source_ip": "192.168.1.42",
+  "action": "login",
+  "outcome": "success"
+}
+17/06/09 20:10:41 INFO slf4j.Slf4jLogger: Slf4jLogger started

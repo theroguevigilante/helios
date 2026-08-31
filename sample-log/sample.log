@@ -1,0 +1,8 @@
+<34>Oct 11 22:14:15 mymachine su: 'su root' failed for lonvick on /dev/pts/8
+CEF:0|Check Point|VPN-1|R80|12345|Accept|3|src=192.168.1.5 dst=10.0.0.1 spt=443 dpt=8080 proto=TCP msg=Firewall accepted connection
+{"timestamp":"2026-08-26T22:14:16Z","level":"info","service":"nginx","message":"GET /api/health 200 0.003s"}
+192.168.1.1 - frank [10/Oct/2000:13:55:36 -0700] "GET /apache_pb.gif HTTP/1.0" 200 2326 "http://www.example.com/start.html" "Mozilla/4.08 [en] (Win98; I)"
+10.0.0.1 - - [28/Aug/2026:10:30:00 +0000] "POST /api/ingest HTTP/1.1" 201 45 "-" "python-requests/2.28.0" rt=0.003 uct=0.001 urt=0.002
+CEF:0|PaloAlto|Firewall|10.0|threat|Spyware Detected|9|src=203.0.113.15 dst=10.1.2.50 dhost=workstation-42 msg=Trojan.GenericKD detected and blocked
+203.0.113.50 - - [28/Aug/2026:12:00:00 +0000] "GET /missing.html HTTP/1.1" 404 169 "-" "Googlebot/2.1"
+Jan 24 12:34:56 switch-core-01 sshd[9821]: Accepted publickey for admin from 10.0.0.5 port 52341 ssh2
