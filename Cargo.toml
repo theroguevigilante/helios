@@ -14,6 +14,7 @@ members = [
     "parsers/helios-parser-nginx",
     "parsers/helios-parser-json",
     "parsers/helios-parser-cef",
+    "parsers/helios-parser-evtx",
     "parsers/helios-parser-zookeeper",
     "parsers/helios-parser-spark",
     "parsers/helios-parser-windows",

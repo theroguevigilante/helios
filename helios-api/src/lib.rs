@@ -12,6 +12,7 @@ use helios_parser::{ParserMetadata, Registry};
 use helios_parser_android::AndroidParser;
 use helios_parser_apache::ApacheParser;
 use helios_parser_cef::CefParser;
+use helios_parser_evtx::EvtxParser;
 use helios_parser_json::JsonParser;
 use helios_parser_nginx::NginxParser;
 use helios_parser_openssh::OpenSshParser;
@@ -68,6 +69,7 @@ pub fn create_router() -> Router {
     let mut registry = Registry::new();
     registry.register(JsonParser::new());
     registry.register(CefParser::new());
+    registry.register(EvtxParser::new());
     registry.register(OpenSshParser::new());
     registry.register(SyslogParser::new());
     registry.register(ApacheParser::new());
@@ -268,6 +270,6 @@ async fn get_statistics() -> Json<serde_json::Value> {
     Json(serde_json::json!({
         "status": "online",
         "processed_events": 0,
-        "active_parsers": 11
+        "active_parsers": 12
     }))
 }

@@ -8,3 +8,7 @@ helios-core = { path = "../helios-core" }
 tokio.workspace = true
 async-trait.workspace = true
 anyhow.workspace = true
+evtx = "0.8"
+serde_json = "1.0"
+serde = { version = "1.0", features = ["derive"] }
+tracing.workspace = true
