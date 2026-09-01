@@ -622,6 +622,7 @@ dependencies = [
  "helios-parser-cef",
  "helios-parser-evtx",
  "helios-parser-json",
+ "helios-parser-leef",
  "helios-parser-nginx",
  "helios-parser-openssh",
  "helios-parser-proxifier",
@@ -653,6 +654,7 @@ dependencies = [
  "helios-parser-cef",
  "helios-parser-evtx",
  "helios-parser-json",
+ "helios-parser-leef",
  "helios-parser-nginx",
  "helios-parser-openssh",
  "helios-parser-proxifier",
@@ -766,6 +768,15 @@ dependencies = [
  "helios-core",
  "helios-parser",
  "serde_json",
+]
+
+[[package]]
+name = "helios-parser-leef"
+version = "0.1.0"
+dependencies = [
+ "chrono",
+ "helios-core",
+ "helios-parser",
 ]
 
 [[package]]

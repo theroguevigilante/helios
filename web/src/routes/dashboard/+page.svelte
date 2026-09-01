@@ -84,8 +84,8 @@
       hostname: 'app-server-03',
       service: 'helios',
       severity: 'DEBUG',
-      message: 'Parser registry initialized with 12 plugins: [syslog, json, cef, apache, nginx, android, openssh, proxifier, spark, windows, zookeeper, evtx]',
-      raw_event: '{"timestamp":"2026-08-26T22:14:22Z","level":"debug","service":"helios","message":"Parser registry initialized with 12 plugins: [syslog, json, cef, apache, nginx, android, openssh, proxifier, spark, windows, zookeeper, evtx]"}'
+      message: 'Parser registry initialized with 13 plugins: [syslog, json, cef, leef, apache, nginx, android, openssh, proxifier, spark, windows, zookeeper, evtx]',
+      raw_event: '{"timestamp":"2026-08-26T22:14:22Z","level":"debug","service":"helios","message":"Parser registry initialized with 13 plugins: [syslog, json, cef, leef, apache, nginx, android, openssh, proxifier, spark, windows, zookeeper, evtx]"}'
     }
   ];
 

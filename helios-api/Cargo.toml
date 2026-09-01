@@ -27,3 +27,4 @@ helios-parser-proxifier = { path = "../parsers/helios-parser-proxifier" }
 helios-parser-cef = { path = "../parsers/helios-parser-cef" }
 
 helios-parser-evtx = { path = "../parsers/helios-parser-evtx" }
+helios-parser-leef = { path = "../parsers/helios-parser-leef" }

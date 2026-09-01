@@ -1,0 +1,9 @@
+[package]
+name = "helios-parser-leef"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+helios-core = { path = "../../helios-core" }
+helios-parser = { path = "../../helios-parser" }
+chrono = "0.4"

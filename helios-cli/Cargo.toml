@@ -31,3 +31,4 @@ tracing.workspace = true
 tracing-subscriber.workspace = true
 anyhow.workspace = true
 helios-parser-evtx = { path = "../parsers/helios-parser-evtx" }
+helios-parser-leef = { path = "../parsers/helios-parser-leef" }

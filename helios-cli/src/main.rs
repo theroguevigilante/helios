@@ -7,6 +7,7 @@ use helios_parser_apache::ApacheParser;
 use helios_parser_cef::CefParser;
 use helios_parser_evtx::EvtxParser;
 use helios_parser_json::JsonParser;
+use helios_parser_leef::LeefParser;
 use helios_parser_nginx::NginxParser;
 use helios_parser_openssh::OpenSshParser;
 use helios_parser_proxifier::ProxifierParser;
@@ -63,6 +64,7 @@ async fn main() -> anyhow::Result<()> {
     registry.register(ApacheParser::new());
     registry.register(NginxParser::new());
     registry.register(JsonParser::new());
+    registry.register(LeefParser::new());
     registry.register(EvtxParser::new());
     registry.register(OpenSshParser::new());
     registry.register(SyslogParser::new());
