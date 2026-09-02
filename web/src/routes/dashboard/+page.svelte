@@ -267,7 +267,7 @@
                   <td class="px-4 py-2.5 font-mono text-xs text-helios-muted">{new Date(event.timestamp).toLocaleTimeString()}</td>
                   <td class="px-4 py-2.5">
                     <span class="px-2 py-0.5 text-xs font-semibold border rounded {severityBg(event.severity)} {severityColor(event.severity)}">
-                      {event.severity ?? 'UNKNOWN'}
+                      {event.severity ?? '—'}
                     </span>
                   </td>
                   <td class="px-4 py-2.5 font-mono text-xs">{event.hostname ?? '—'}</td>
