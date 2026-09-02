@@ -1,3 +1,4 @@
+use chrono::{DateTime, Utc};
 use helios_core::{Error, Result, UniversalEvent};
 use helios_parser::{Parser, ParserMetadata};
 use serde_json::Value;
@@ -35,15 +36,24 @@ impl Parser for JsonParser {
         };
 
         if let Some(obj) = value.as_object() {
-            if let Some(msg) = obj.get("message").and_then(|v| v.as_str()) {
+            if let Some(msg) = obj.get("message").or(obj.get("msg")).and_then(|v| v.as_str()) {
                 event.message = msg.to_string();
             }
-            if let Some(level) = obj
-                .get("level")
-                .or(obj.get("severity"))
-                .and_then(|v| v.as_str())
-            {
+            if let Some(level) = obj.get("level").or(obj.get("severity")).and_then(|v| v.as_str()) {
                 event.severity = Some(level.to_string());
+            }
+            if let Some(host) = obj.get("hostname").or(obj.get("host")).and_then(|v| v.as_str()) {
+                event.hostname = Some(host.to_string());
+            }
+            if let Some(svc) = obj.get("service").or(obj.get("app")).and_then(|v| v.as_str()) {
+                event.service = Some(svc.to_string());
+            }
+            if let Some(ts) = obj.get("timestamp").or(obj.get("time")).or(obj.get("@timestamp")).and_then(|v| v.as_str()) {
+                if let Ok(parsed_ts) = DateTime::parse_from_rfc3339(ts) {
+                    event.timestamp = parsed_ts.with_timezone(&Utc);
+                } else if let Ok(parsed_ts) = ts.parse::<DateTime<Utc>>() {
+                    event.timestamp = parsed_ts;
+                }
             }
         }
 
@@ -53,7 +63,7 @@ impl Parser for JsonParser {
     fn metadata(&self) -> ParserMetadata {
         ParserMetadata {
             version: env!("CARGO_PKG_VERSION").to_string(),
-            description: "Generic JSON log parser".to_string(),
+            description: "Generic JSON log parser with enhanced field extraction".to_string(),
             author: "Helios Team".to_string(),
         }
     }
