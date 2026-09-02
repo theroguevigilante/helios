@@ -200,12 +200,19 @@
       </div>
     {/if}
     
+    <main class="flex flex-col flex-1 overflow-hidden">
     {#if uploadWarning}
-      <div class="mx-4 mt-4 p-4 text-sm font-semibold border rounded-lg bg-amber-500/10 border-amber-500/30 text-amber-400">
-        {uploadWarning}
+      <div class="mx-4 mt-4 p-4 text-sm font-semibold border rounded-lg bg-amber-500/10 border-amber-500/30 text-amber-400 flex-shrink-0">
+        <div class="flex justify-between items-start">
+          <span>{uploadWarning}</span>
+          <button onclick={() => uploadWarning = ''} class="text-amber-500/70 hover:text-amber-500 ml-4 shrink-0" aria-label="Dismiss warning">
+            <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+            </svg>
+          </button>
+        </div>
       </div>
     {/if}
-    <main class="flex flex-col flex-1 overflow-hidden">
       <!-- Charts row -->
       <div class="grid grid-cols-1 gap-4 p-4 lg:grid-cols-2">
         <div class="p-4 border rounded-xl border-helios-border bg-helios-surface">
