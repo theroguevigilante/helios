@@ -156,6 +156,8 @@
   <title>Dashboard — Helios</title>
 </svelte:head>
 
+
+<!-- svelte-ignore a11y_no_static_element_interactions -->
 <div class="relative flex flex-col h-screen" ondragover={handleDragOver} ondragleave={handleDragLeave} ondrop={handleDrop}>
   <!-- Top bar -->
     <header class="flex items-center justify-between px-6 py-3 border-b border-helios-border bg-helios-surface relative z-10">

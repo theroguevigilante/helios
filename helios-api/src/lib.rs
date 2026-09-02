@@ -1,3 +1,4 @@
+use axum::extract::DefaultBodyLimit;
 use axum::{
     extract::{Multipart, State},
     http::StatusCode,
@@ -72,6 +73,7 @@ pub async fn run_server(port: u16) -> anyhow::Result<()> {
         .route("/api/v1/stream", get(stream_events))
         .route("/api/v1/upload", post(upload_logs))
         .layer(cors)
+        .layer(DefaultBodyLimit::disable())
         .with_state(state);
 
     let addr = format!("0.0.0.0:{}", port);
