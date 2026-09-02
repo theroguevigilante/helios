@@ -119,7 +119,7 @@
       const matchesSeverity = selectedSeverity === 'ALL' || ev.severity === selectedSeverity;
       const matchesSearch =
         !searchQuery ||
-        ev.message.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        (ev.message?.toLowerCase().includes(searchQuery.toLowerCase()) ?? false) ||
         (ev.hostname?.toLowerCase().includes(searchQuery.toLowerCase()) ?? false) ||
         (ev.service?.toLowerCase().includes(searchQuery.toLowerCase()) ?? false);
       return matchesSeverity && matchesSearch;
@@ -259,7 +259,7 @@
               </tr>
             </thead>
             <tbody>
-              {#each filteredEvents as event (event.timestamp + event.message)}
+              {#each filteredEvents as event, i (i)}
                 <tr
                   class="border-b cursor-pointer border-helios-border/50 hover:bg-helios-surface-2/50 transition-colors"
                   onclick={() => selectedEvent = selectedEvent === event ? null : event}

@@ -19,7 +19,7 @@
     DEBUG: '#6b7280'
   };
 
-  function updateChart() {
+  function updateChart(events: Event[]) {
     if (!chart) return;
 
     const counts: Record<string, number> = {};
@@ -51,7 +51,7 @@
 
   onMount(() => {
     chart = echarts.init(chartEl, undefined, { renderer: 'canvas' });
-    updateChart();
+    updateChart(events);
 
     const observer = new ResizeObserver(() => chart?.resize());
     observer.observe(chartEl);
@@ -64,7 +64,7 @@
 
   $effect(() => {
     events;
-    updateChart();
+    updateChart(events);
   });
 </script>
 

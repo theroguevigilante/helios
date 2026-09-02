@@ -10,7 +10,7 @@
   let chartEl: HTMLDivElement;
   let chart: echarts.ECharts;
 
-  function updateChart() {
+  function updateChart(events: Event[]) {
     if (!chart) return;
 
     // Bucket events by second
@@ -49,7 +49,7 @@
 
   onMount(() => {
     chart = echarts.init(chartEl, undefined, { renderer: 'canvas' });
-    updateChart();
+    updateChart(events);
 
     const observer = new ResizeObserver(() => chart?.resize());
     observer.observe(chartEl);
@@ -62,7 +62,7 @@
 
   $effect(() => {
     events;
-    updateChart();
+    updateChart(events);
   });
 </script>
 
