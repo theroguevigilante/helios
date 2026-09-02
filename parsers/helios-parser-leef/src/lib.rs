@@ -53,7 +53,7 @@ impl Parser for LeefParser {
         };
 
         // Standardize delimiter (e.g. x09 or ^ or \t)
-        let actual_delim = match delimiter {
+        let _actual_delim = match delimiter {
             "x09" | "\\t" | "0x09" => "\t",
             "x5e" => "^",
             other => other,
@@ -75,8 +75,6 @@ impl Parser for LeefParser {
             "ERROR".to_string()
         } else if remainder.contains("sev=6") || remainder.contains("sev=5") {
             "WARN".to_string()
-        } else if remainder.contains("sev=4") || remainder.contains("sev=3") {
-            "INFO".to_string()
         } else {
             "INFO".to_string()
         };
