@@ -28,3 +28,8 @@ helios-parser-cef = { path = "../parsers/helios-parser-cef" }
 
 helios-parser-evtx = { path = "../parsers/helios-parser-evtx" }
 helios-parser-leef = { path = "../parsers/helios-parser-leef" }
+tokio-stream.workspace = true
+futures.workspace = true
+helios-ingest = { path = "../helios-ingest" }
+tempfile = "3"
+anyhow.workspace = true

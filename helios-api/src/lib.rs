@@ -1,14 +1,17 @@
 use axum::{
-    extract::State,
+    extract::{Multipart, State},
     http::StatusCode,
-    response::IntoResponse,
+    response::{
+        sse::{Event, Sse},
+        IntoResponse,
+    },
     routing::{get, post},
     Json, Router,
 };
 use helios_core::UniversalEvent;
 use helios_detector::FormatDetector;
-use helios_enrichment::EnrichmentPipeline;
-use helios_parser::{ParserMetadata, Registry};
+use helios_ingest::{EvtxFileSource, LogSource};
+use helios_parser::Registry;
 use helios_parser_android::AndroidParser;
 use helios_parser_apache::ApacheParser;
 use helios_parser_cef::CefParser;
@@ -22,51 +25,25 @@ use helios_parser_spark::SparkParser;
 use helios_parser_syslog::SyslogParser;
 use helios_parser_windows::WindowsParser;
 use helios_parser_zookeeper::ZooKeeperParser;
-use serde::{Deserialize, Serialize};
+
 use std::sync::Arc;
+use tokio::sync::broadcast;
+use tokio_stream::wrappers::BroadcastStream;
+use tokio_stream::StreamExt as _;
 use tower_http::cors::{Any, CorsLayer};
-use tracing::{info, warn};
 
-pub struct AppState {
-    pub registry: Registry,
-    pub enrichment: EnrichmentPipeline,
+#[derive(Clone)]
+struct AppState {
+    registry: Arc<Registry>,
+    tx: broadcast::Sender<UniversalEvent>,
 }
 
-#[derive(Debug, Deserialize)]
-pub struct DetectRequest {
-    pub log: String,
-}
+pub async fn run_server(port: u16) -> anyhow::Result<()> {
+    let cors = CorsLayer::new()
+        .allow_origin(Any)
+        .allow_methods(Any)
+        .allow_headers(Any);
 
-#[derive(Debug, Serialize)]
-pub struct DetectResponse {
-    pub detected: bool,
-    pub format: Option<String>,
-}
-
-#[derive(Debug, Deserialize)]
-pub struct ParseRequest {
-    pub log: String,
-    pub format: Option<String>,
-}
-
-#[derive(Debug, Serialize)]
-pub struct ParseResponse {
-    pub format: String,
-    pub event: UniversalEvent,
-}
-
-#[derive(Debug, Serialize)]
-pub struct ParserInfo {
-    pub name: String,
-    pub metadata: ParserMetadata,
-}
-
-#[derive(Debug, Serialize)]
-pub struct ErrorResponse {
-    pub error: String,
-}
-
-pub fn create_router() -> Router {
     let mut registry = Registry::new();
     registry.register(JsonParser::new());
     registry.register(CefParser::new());
@@ -82,196 +59,144 @@ pub fn create_router() -> Router {
     registry.register(AndroidParser::new());
     registry.register(ProxifierParser::new());
 
-    let state = Arc::new(AppState {
-        registry,
-        enrichment: EnrichmentPipeline::new(),
-    });
+    let (tx, _rx) = broadcast::channel(10000);
 
-    let cors = CorsLayer::new()
-        .allow_origin(Any)
-        .allow_methods(Any)
-        .allow_headers(Any);
-
-    let api_v1 = Router::new()
-        .route("/health", get(health_check))
-        .route("/parsers", get(list_parsers))
-        .route("/detect", post(detect_format))
-        .route("/parse", post(parse_log))
-        .route("/normalize", post(normalize_log))
-        .route("/events", post(ingest_events).get(list_events))
-        .route("/search", post(search_events))
-        .route("/stats", get(get_statistics))
-        .with_state(state.clone());
-
-    Router::new()
-        .route("/health", get(health_check))
-        .nest("/api/v1", api_v1)
-        .layer(cors)
-}
-
-pub async fn run_server(port: u16) -> Result<(), std::io::Error> {
-    let app = create_router();
-    let addr = format!("0.0.0.0:{}", port);
-    let listener = tokio::net::TcpListener::bind(&addr).await?;
-
-    info!("Starting Helios API server on {}", addr);
-    axum::serve(listener, app).await
-}
-
-async fn health_check() -> Json<serde_json::Value> {
-    Json(serde_json::json!({
-        "status": "ok",
-        "service": "helios-api",
-        "version": env!("CARGO_PKG_VERSION")
-    }))
-}
-
-async fn list_parsers(State(state): State<Arc<AppState>>) -> Json<Vec<ParserInfo>> {
-    let parsers = state
-        .registry
-        .parsers()
-        .iter()
-        .map(|p| ParserInfo {
-            name: p.name().to_string(),
-            metadata: p.metadata(),
-        })
-        .collect();
-
-    Json(parsers)
-}
-
-async fn detect_format(
-    State(state): State<Arc<AppState>>,
-    Json(payload): Json<DetectRequest>,
-) -> Json<DetectResponse> {
-    let detector = FormatDetector::new(&state.registry);
-    let format = detector.detect(&payload.log).map(|s| s.to_string());
-    let detected = format.is_some();
-
-    Json(DetectResponse { detected, format })
-}
-
-async fn parse_log(
-    State(state): State<Arc<AppState>>,
-    Json(payload): Json<ParseRequest>,
-) -> Result<Json<ParseResponse>, (StatusCode, Json<ErrorResponse>)> {
-    let detector = FormatDetector::new(&state.registry);
-
-    // Determine parser name: explicit or detected
-    let parser_name = match payload.format.as_deref() {
-        Some(name) => name.to_string(),
-        None => detector
-            .detect(&payload.log)
-            .map(|s| s.to_string())
-            .ok_or_else(|| {
-                (
-                    StatusCode::BAD_REQUEST,
-                    Json(ErrorResponse {
-                        error: "Could not detect log format".to_string(),
-                    }),
-                )
-            })?,
+    let state = AppState {
+        registry: Arc::new(registry),
+        tx,
     };
 
-    let parser = state
-        .registry
-        .parsers()
-        .iter()
-        .find(|p| p.name() == parser_name)
-        .ok_or_else(|| {
-            (
-                StatusCode::NOT_FOUND,
-                Json(ErrorResponse {
-                    error: format!("Parser '{}' not found", parser_name),
-                }),
-            )
-        })?;
+    let app = Router::new()
+        .route("/api/v1/stats", get(get_stats))
+        .route("/api/v1/events", post(ingest_live))
+        .route("/api/v1/stream", get(stream_events))
+        .route("/api/v1/upload", post(upload_logs))
+        .layer(cors)
+        .with_state(state);
 
-    match parser.parse(&payload.log) {
-        Ok(event) => Ok(Json(ParseResponse {
-            format: parser_name,
-            event,
-        })),
-        Err(e) => {
-            warn!("Failed to parse log: {}", e);
-            Err((
-                StatusCode::UNPROCESSABLE_ENTITY,
-                Json(ErrorResponse {
-                    error: format!("Parsing error: {}", e),
-                }),
-            ))
-        }
-    }
+    let addr = format!("0.0.0.0:{}", port);
+    let listener = tokio::net::TcpListener::bind(&addr).await?;
+    tracing::info!("Starting Helios API server on {}", addr);
+
+    axum::serve(listener, app).await?;
+    Ok(())
 }
 
-async fn normalize_log(
-    State(state): State<Arc<AppState>>,
-    Json(payload): Json<ParseRequest>,
-) -> Result<Json<ParseResponse>, (StatusCode, Json<ErrorResponse>)> {
-    let detector = FormatDetector::new(&state.registry);
-
-    let parser_name = detector
-        .detect(&payload.log)
-        .map(|s| s.to_string())
-        .ok_or_else(|| {
-            (
-                StatusCode::BAD_REQUEST,
-                Json(ErrorResponse {
-                    error: "Format not recognized — unable to normalize".to_string(),
-                }),
-            )
-        })?;
-
-    let parser = state
-        .registry
-        .parsers()
-        .iter()
-        .find(|p| p.name() == parser_name)
-        .ok_or_else(|| {
-            (
-                StatusCode::NOT_FOUND,
-                Json(ErrorResponse {
-                    error: format!("Parser '{}' not found", parser_name),
-                }),
-            )
-        })?;
-
-    let mut event = parser.parse(&payload.log).map_err(|e| {
-        (
-            StatusCode::UNPROCESSABLE_ENTITY,
-            Json(ErrorResponse {
-                error: format!("Normalization error: {}", e),
-            }),
-        )
-    })?;
-
-    state.enrichment.enrich(&mut event);
-
-    Ok(Json(ParseResponse {
-        format: parser_name,
-        event,
-    }))
-}
-
-async fn ingest_events() -> impl IntoResponse {
-    (
-        StatusCode::ACCEPTED,
-        Json(serde_json::json!({ "status": "accepted" })),
-    )
-}
-
-async fn list_events() -> Json<Vec<UniversalEvent>> {
-    Json(Vec::new())
-}
-
-async fn search_events() -> Json<Vec<UniversalEvent>> {
-    Json(Vec::new())
-}
-
-async fn get_statistics() -> Json<serde_json::Value> {
+async fn get_stats() -> impl IntoResponse {
     Json(serde_json::json!({
         "status": "online",
         "processed_events": 0,
         "active_parsers": 13
     }))
+}
+
+async fn ingest_live(State(state): State<AppState>, body: String) -> impl IntoResponse {
+    let detector = FormatDetector::new(&state.registry);
+    let mut parsed_count = 0;
+
+    for line in body.lines() {
+        if line.trim().is_empty() {
+            continue;
+        }
+        if let Some(parser_name) = detector.detect(line) {
+            if let Some(parser) = state
+                .registry
+                .parsers()
+                .iter()
+                .find(|p| p.name() == parser_name)
+            {
+                if let Ok(event) = parser.parse(line) {
+                    let _ = state.tx.send(event);
+                    parsed_count += 1;
+                }
+            }
+        }
+    }
+    Json(serde_json::json!({"status": "ok", "ingested": parsed_count}))
+}
+
+async fn stream_events(
+    State(state): State<AppState>,
+) -> Sse<impl tokio_stream::Stream<Item = Result<Event, std::convert::Infallible>>> {
+    let rx = state.tx.subscribe();
+    let stream = BroadcastStream::new(rx).filter_map(|res| match res {
+        Ok(event) => {
+            let json = serde_json::to_string(&event).unwrap_or_default();
+            Some(Ok(Event::default().data(json)))
+        }
+        Err(_) => None,
+    });
+    Sse::new(stream).keep_alive(axum::response::sse::KeepAlive::new())
+}
+
+async fn upload_logs(
+    State(state): State<AppState>,
+    mut multipart: Multipart,
+) -> Result<Json<Vec<UniversalEvent>>, (StatusCode, String)> {
+    let detector = FormatDetector::new(&state.registry);
+    let mut events = Vec::new();
+
+    while let Some(field) = multipart
+        .next_field()
+        .await
+        .map_err(|e| (StatusCode::BAD_REQUEST, e.to_string()))?
+    {
+        let file_name = field.file_name().unwrap_or("").to_string();
+        let data = field
+            .bytes()
+            .await
+            .map_err(|e| (StatusCode::INTERNAL_SERVER_ERROR, e.to_string()))?;
+
+        if file_name.ends_with(".evtx") {
+            use std::io::Write;
+            let mut temp_file = tempfile::NamedTempFile::new()
+                .map_err(|e| (StatusCode::INTERNAL_SERVER_ERROR, e.to_string()))?;
+            temp_file
+                .write_all(&data)
+                .map_err(|e| (StatusCode::INTERNAL_SERVER_ERROR, e.to_string()))?;
+
+            let source = EvtxFileSource::new(temp_file.path().to_string_lossy().to_string());
+            let (tx, mut rx) = tokio::sync::mpsc::channel(1000);
+
+            tokio::spawn(async move {
+                let _ = source.run(tx).await;
+            });
+
+            while let Some(line) = rx.recv().await {
+                if let Some(parser_name) = detector.detect(&line) {
+                    if let Some(parser) = state
+                        .registry
+                        .parsers()
+                        .iter()
+                        .find(|p| p.name() == parser_name)
+                    {
+                        if let Ok(event) = parser.parse(&line) {
+                            events.push(event);
+                        }
+                    }
+                }
+            }
+        } else {
+            let body = String::from_utf8_lossy(&data);
+            for line in body.lines() {
+                if line.trim().is_empty() {
+                    continue;
+                }
+                if let Some(parser_name) = detector.detect(line) {
+                    if let Some(parser) = state
+                        .registry
+                        .parsers()
+                        .iter()
+                        .find(|p| p.name() == parser_name)
+                    {
+                        if let Ok(event) = parser.parse(line) {
+                            events.push(event);
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    Ok(Json(events))
 }

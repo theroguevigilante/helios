@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { onMount } from 'svelte';
+  import { onMount, onDestroy } from 'svelte';
   import SeverityChart from '$lib/components/SeverityChart.svelte';
   import TimelineChart from '$lib/components/TimelineChart.svelte';
 
@@ -18,89 +18,101 @@
   let isConnected = $state(false);
   let eventCount = $state(0);
   let eventsPerSec = $state(0);
-  let parserCount = $state(4);
+  let parserCount = $state(13);
   let selectedEvent = $state<ParsedEvent | null>(null);
-
-  // Mock data for demo — replace with WebSocket / API calls later
-  const MOCK_EVENTS: ParsedEvent[] = [
-    {
-      timestamp: '2026-08-26T22:14:15Z',
-      hostname: 'firewall1.localdomain',
-      service: '%ASA-4-106023',
-      severity: 'WARN',
-      message: 'Deny tcp src outside:192.168.1.1/1234 dst inside:10.0.0.1/80 by access-group "outside_in"',
-      raw_event: '<34>Aug 26 22:14:15 firewall1.localdomain %ASA-4-106023: Deny tcp src outside:192.168.1.1/1234 dst inside:10.0.0.1/80 by access-group "outside_in"'
-    },
-    {
-      timestamp: '2026-08-26T22:14:16Z',
-      hostname: 'webserver.prod',
-      service: 'nginx',
-      severity: 'INFO',
-      message: 'GET /api/health 200 0.003s',
-      raw_event: '{"timestamp":"2026-08-26T22:14:16Z","level":"info","service":"nginx","message":"GET /api/health 200 0.003s"}'
-    },
-    {
-      timestamp: '2026-08-26T22:14:17Z',
-      hostname: 'db-primary',
-      service: 'postgresql',
-      severity: 'ERROR',
-      message: 'connection limit exceeded for non-superuser connections',
-      raw_event: '<11>Aug 26 22:14:17 db-primary postgresql[4521]: FATAL: connection limit exceeded for non-superuser connections'
-    },
-    {
-      timestamp: '2026-08-26T22:14:18Z',
-      hostname: 'k8s-node-02',
-      service: 'kubelet',
-      severity: 'CRIT',
-      message: 'NodeNotReady condition detected, pod eviction initiated',
-      raw_event: '{"timestamp":"2026-08-26T22:14:18Z","level":"critical","source":"kubelet","host":"k8s-node-02","message":"NodeNotReady condition detected, pod eviction initiated"}'
-    },
-    {
-      timestamp: '2026-08-26T22:14:19Z',
-      hostname: 'switch-core-01',
-      service: 'sshd',
-      severity: 'INFO',
-      message: 'Accepted publickey for admin from 10.0.0.5 port 52341 ssh2',
-      raw_event: '<86>Aug 26 22:14:19 switch-core-01 sshd[9821]: Accepted publickey for admin from 10.0.0.5 port 52341 ssh2'
-    },
-    {
-      timestamp: '2026-08-26T22:14:20Z',
-      hostname: 'paloalto-fw',
-      service: '%PAN-6-THREAT',
-      severity: 'WARN',
-      message: 'Spyware detected: Trojan.GenericKD source=203.0.113.15 dest=10.1.2.50 action=drop',
-      raw_event: '<36>Aug 26 22:14:20 paloalto-fw %PAN-6-THREAT: Spyware detected: Trojan.GenericKD source=203.0.113.15 dest=10.1.2.50 action=drop'
-    },
-    {
-      timestamp: '2026-08-26T22:14:21Z',
-      hostname: 'fortinet-edge',
-      service: '%FORTINET-5-0100',
-      severity: 'NOTICE',
-      message: 'SSL VPN tunnel established user=john.doe src=198.51.100.22 duration=0s',
-      raw_event: '<45>Aug 26 22:14:21 fortinet-edge %FORTINET-5-0100: SSL VPN tunnel established user=john.doe src=198.51.100.22 duration=0s'
-    },
-    {
-      timestamp: '2026-08-26T22:14:22Z',
-      hostname: 'app-server-03',
-      service: 'helios',
-      severity: 'DEBUG',
-      message: 'Parser registry initialized with 13 plugins: [syslog, json, cef, leef, apache, nginx, android, openssh, proxifier, spark, windows, zookeeper, evtx]',
-      raw_event: '{"timestamp":"2026-08-26T22:14:22Z","level":"debug","service":"helios","message":"Parser registry initialized with 13 plugins: [syslog, json, cef, leef, apache, nginx, android, openssh, proxifier, spark, windows, zookeeper, evtx]"}'
-    }
-  ];
+  let isDragging = $state(false);
+  let uploadWarning = $state('');
+  
+  let eventSource: EventSource | null = null;
 
   onMount(() => {
-    isConnected = true;
-    eventCount = MOCK_EVENTS.length;
-    eventsPerSec = 142;
-    // Simulate events arriving over time
-    MOCK_EVENTS.forEach((ev, i) => {
-      setTimeout(() => {
-        events = [...events, ev];
-        eventCount = events.length;
-      }, i * 300);
-    });
+    eventSource = new EventSource('http://localhost:8080/api/v1/stream');
+    
+    eventSource.onopen = () => {
+      isConnected = true;
+    };
+    
+    eventSource.onmessage = (e) => {
+      try {
+        const ev = JSON.parse(e.data);
+        events = [ev, ...events].slice(0, 1000);
+        eventCount++;
+      } catch (err) {
+        console.error(err);
+      }
+    };
+
+    eventSource.onerror = () => {
+      isConnected = false;
+    };
+
+    // Calculate events per second roughly
+    let lastCount = eventCount;
+    const interval = setInterval(() => {
+      eventsPerSec = eventCount - lastCount;
+      lastCount = eventCount;
+    }, 1000);
+
+    return () => {
+      clearInterval(interval);
+      if (eventSource) {
+        eventSource.close();
+      }
+    };
   });
+
+  function handleDragOver(e: DragEvent) {
+    e.preventDefault();
+    isDragging = true;
+  }
+
+  function handleDragLeave(e: DragEvent) {
+    e.preventDefault();
+    isDragging = false;
+  }
+
+  function handleDrop(e: DragEvent) {
+    e.preventDefault();
+    isDragging = false;
+    if (e.dataTransfer?.files.length) {
+      const file = e.dataTransfer.files[0];
+      if (file.size > 5 * 1024 * 1024) {
+        uploadWarning = `Warning: Large file detected (${(file.size / 1024 / 1024).toFixed(1)}MB). For best forensic processing speed, please use the Helios CLI. The dashboard will only render the first 1,000 logs to prevent browser freezing.`;
+      } else {
+        uploadWarning = '';
+      }
+      uploadFile(file);
+    }
+  }
+
+  async function uploadFile(file: File) {
+    const formData = new FormData();
+    formData.append('file', file);
+    try {
+      const res = await fetch('http://localhost:8080/api/v1/upload', {
+        method: 'POST',
+        body: formData
+      });
+      if (res.ok) {
+        const data = await res.json();
+        events = [...data, ...events].slice(0, 1000);
+        eventCount += data.length;
+      }
+    } catch (err) {
+      console.error(err);
+    }
+  }
+
+  function downloadJSON() {
+    const jsonStr = JSON.stringify(events, null, 2);
+    const blob = new Blob([jsonStr], { type: 'application/json' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = 'helios_preprocessed_logs.json';
+    a.click();
+    URL.revokeObjectURL(url);
+  }
 
   let filteredEvents = $derived(
     events.filter((ev) => {
@@ -139,18 +151,22 @@
   }
 </script>
 
+
 <svelte:head>
   <title>Dashboard — Helios</title>
 </svelte:head>
 
-<div class="flex flex-col h-screen">
+<div class="relative flex flex-col h-screen" ondragover={handleDragOver} ondragleave={handleDragLeave} ondrop={handleDrop}>
   <!-- Top bar -->
-  <header class="flex items-center justify-between px-6 py-3 border-b border-helios-border bg-helios-surface">
+    <header class="flex items-center justify-between px-6 py-3 border-b border-helios-border bg-helios-surface relative z-10">
     <div class="flex items-center gap-3">
       <a href="/" class="text-xl font-bold text-helios-accent">Helios</a>
       <span class="text-sm text-helios-muted">Dashboard</span>
     </div>
     <div class="flex items-center gap-6 text-sm">
+      <button onclick={downloadJSON} class="px-3 py-1.5 text-xs font-semibold rounded bg-helios-surface-2 border border-helios-border hover:bg-helios-border text-helios-text transition-colors">
+        Export JSON
+      </button>
       <div class="flex items-center gap-2">
         <span class="w-2 h-2 rounded-full {isConnected ? 'bg-helios-green' : 'bg-helios-red'}"></span>
         <span class="text-helios-muted">{isConnected ? 'Connected' : 'Disconnected'}</span>
@@ -169,6 +185,24 @@
 
   <div class="flex flex-1 overflow-hidden">
     <!-- Main content -->
+    <!-- Dropzone overlay -->
+    {#if isDragging}
+      <div class="absolute inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm pointer-events-none">
+        <div class="p-12 text-center border-4 border-dashed rounded-3xl border-helios-accent bg-helios-surface/80">
+          <svg class="w-16 h-16 mx-auto mb-4 text-helios-accent" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12" />
+          </svg>
+          <h2 class="text-2xl font-bold text-helios-text">Drop log file to analyze</h2>
+          <p class="mt-2 text-helios-muted">Supports raw text, syslogs, CEF, JSON, and .evtx binaries</p>
+        </div>
+      </div>
+    {/if}
+    
+    {#if uploadWarning}
+      <div class="mx-4 mt-4 p-4 text-sm font-semibold border rounded-lg bg-amber-500/10 border-amber-500/30 text-amber-400">
+        {uploadWarning}
+      </div>
+    {/if}
     <main class="flex flex-col flex-1 overflow-hidden">
       <!-- Charts row -->
       <div class="grid grid-cols-1 gap-4 p-4 lg:grid-cols-2">
