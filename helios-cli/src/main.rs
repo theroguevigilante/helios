@@ -63,7 +63,6 @@ async fn main() -> anyhow::Result<()> {
     registry.register(CefParser::new());
     registry.register(ApacheParser::new());
     registry.register(NginxParser::new());
-    registry.register(JsonParser::new());
     registry.register(LeefParser::new());
     registry.register(EvtxParser::new());
     registry.register(OpenSshParser::new());
@@ -74,6 +73,7 @@ async fn main() -> anyhow::Result<()> {
     registry.register(AndroidParser::new());
     registry.register(ProxifierParser::new());
 
+    registry.register(JsonParser::new());
     let detector = FormatDetector::new(&registry);
 
     match &cli.command {

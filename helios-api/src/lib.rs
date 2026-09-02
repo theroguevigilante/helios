@@ -46,7 +46,6 @@ pub async fn run_server(port: u16) -> anyhow::Result<()> {
         .allow_headers(Any);
 
     let mut registry = Registry::new();
-    registry.register(JsonParser::new());
     registry.register(CefParser::new());
     registry.register(LeefParser::new());
     registry.register(EvtxParser::new());
@@ -60,6 +59,7 @@ pub async fn run_server(port: u16) -> anyhow::Result<()> {
     registry.register(AndroidParser::new());
     registry.register(ProxifierParser::new());
 
+    registry.register(JsonParser::new());
     let (tx, _rx) = broadcast::channel(10000);
 
     let state = AppState {
