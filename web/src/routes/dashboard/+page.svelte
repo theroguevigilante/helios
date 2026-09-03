@@ -10,6 +10,7 @@
   let events = $state<ParsedEvent[]>([]);
   let isConnected = $state(false);
   let isPaused = $state(false);
+  let queuedEvents: ParsedEvent[] = [];
   
   let searchQuery = $state('');
   let selectedSeverity = $state('ALL');
@@ -94,14 +95,22 @@
     };
 
     eventSource.onmessage = (e) => {
-      if (isPaused) return; // Drop events if paused
       const newEvent: ParsedEvent = JSON.parse(e.data);
-      events = [newEvent, ...events];
+      if (isPaused) {
+        queuedEvents.push(newEvent);
+      } else {
+        events = [newEvent, ...events];
+      }
     };
   }
 
   function togglePause() {
     isPaused = !isPaused;
+    if (!isPaused && queuedEvents.length > 0) {
+      // Flush queued events
+      events = [...queuedEvents.reverse(), ...events];
+      queuedEvents = [];
+    }
   }
 
   function clearStream() {
@@ -145,6 +154,10 @@
       });
       if (!res.ok) {
         console.error("Upload failed", await res.text());
+      } else {
+        const data = await res.json();
+        // Prepend the new parsed events from the uploaded file
+        events = [...data, ...events];
       }
     } catch (e) {
       console.error("Upload error", e);

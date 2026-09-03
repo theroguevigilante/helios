@@ -26,9 +26,17 @@
 
     chart.setOption({
       tooltip: { trigger: 'axis', backgroundColor: '#1a1a26', borderColor: '#2a2a3a', textStyle: { color: '#e4e4ef' } },
-      grid: { top: 10, right: 16, bottom: 24, left: 40 },
+      grid: { top: 30, right: 16, bottom: 24, left: 40 },
+            toolbox: {
+        feature: {
+          brush: { type: ['lineX', 'clear'] }
+        },
+        top: 0,
+        right: 10,
+        iconStyle: { borderColor: '#8888a0' }
+      },
       brush: {
-        toolbox: ['lineX', 'clear'],
+        
         xAxisIndex: 'all',
         outOfBrush: { colorAlpha: 0.1 }
       },
@@ -47,7 +55,13 @@
         {
           type: 'bar',
           data: sorted.map(([, v]) => v),
-          itemStyle: { color: '#f59e0b', borderRadius: [4, 4, 0, 0] },
+          itemStyle: { 
+            color: new echarts.graphic.LinearGradient(0, 0, 0, 1, [
+              { offset: 0, color: '#38bdf8' }, // sky-400
+              { offset: 1, color: '#818cf8' }  // indigo-400
+            ]),
+            borderRadius: [4, 4, 0, 0] 
+          },
           barWidth: '60%'
         }
       ]
