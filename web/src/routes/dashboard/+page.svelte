@@ -48,8 +48,7 @@
   let statsInterval: number;
 
   let selectedEvent = $state<ParsedEvent | null>(null);
-  let isDragging = $state(false);
-  let uploadWarning = $state('');
+    let uploadWarning = $state('');
   
   let eventSource: EventSource | null = null;
   let virtualListEl: HTMLDivElement | null = $state(null);
@@ -119,31 +118,6 @@
     selectedEvent = null;
   }
 
-  // Drag and drop handlers
-  function handleDragOver(e: DragEvent) {
-    e.preventDefault();
-    isDragging = true;
-  }
-
-  function handleDragLeave(e: DragEvent) {
-    e.preventDefault();
-    isDragging = false;
-  }
-
-  function handleDrop(e: DragEvent) {
-    e.preventDefault();
-    isDragging = false;
-    
-    if (e.dataTransfer?.files?.length) {
-      const file = e.dataTransfer.files[0];
-      if (file.size > 5 * 1024 * 1024) {
-        uploadWarning = `Warning: Large file detected (${(file.size / 1024 / 1024).toFixed(1)}MB). The virtualized grid can handle it, but initial parsing may take a moment.`;
-      } else {
-        uploadWarning = '';
-      }
-      uploadFile(file);
-    }
-  }
 
   async function uploadFile(file: File) {
     const formData = new FormData();
@@ -191,12 +165,7 @@
 </svelte:head>
 
 <!-- svelte-ignore a11y_no_static_element_interactions -->
-<div 
-  class="relative flex flex-col h-screen text-helios-text bg-helios-bg font-sans"
-  ondragover={handleDragOver}
-  ondragleave={handleDragLeave}
-  ondrop={handleDrop}
->
+<div class="relative flex flex-col h-screen text-helios-text bg-helios-bg font-sans">
   <!-- Top bar -->
   <header class="flex items-center justify-between px-6 py-3 border-b border-helios-border bg-helios-surface shadow-sm shrink-0">
     <div class="flex items-center gap-3">
@@ -264,7 +233,14 @@
   <!-- Main IDE Layout -->
   <div class="flex flex-1 overflow-hidden">
     <!-- Left Sidebar (Filters) -->
-    <Sidebar bind:searchQuery bind:selectedSeverity />
+    <Sidebar bind:searchQuery bind:selectedSeverity onFileUpload={(file) => {
+      if (file.size > 5 * 1024 * 1024) {
+        uploadWarning = `Warning: Large file detected (${(file.size / 1024 / 1024).toFixed(1)}MB). The virtualized grid can handle it, but initial parsing may take a moment.`;
+      } else {
+        uploadWarning = '';
+      }
+      uploadFile(file);
+    }} />
 
     <!-- Center Main Content -->
     <main class="flex flex-col flex-1 overflow-hidden relative bg-helios-bg">
