@@ -1,39 +1,33 @@
-# Helios
+# Helios: The Swiss Army Knife of Log Preprocessing
 
-**Helios** is a high-performance Universal Log Pre-processing & Observability Platform built in Rust with a modern SvelteKit frontend. It automatically detects, parses, enriches, and normalizes unstructured and structured log formats into a unified event schema.
+**Helios** is a high-performance Universal Log Pre-processing & Observability Platform built natively in **Rust** with a modern **Svelte 5** frontend. It automatically detects, parses, enriches, and normalizes unstructured and structured log formats—from raw Syslog to complex EVTX binaries—into a unified event schema.
 
 ---
 
-## Workspace Structure
+## 🚀 Key Features
 
-The project is organized into modular Rust crates and a modern SvelteKit frontend:
+- **Blazing Fast Native Backend**: Built completely in Rust. Zero JVM bloat. Handles gigabytes of unparsed logs in seconds.
+- **Infinite DOM Virtualization**: The frontend dashboard seamlessly renders millions of log events without crashing or lagging the browser.
+- **Multi-Tab Forensic Workspace**: Instantly switch between the live log stream and static file analysis in isolated, state-preserving tabs.
+- **Zero Config Auto-Detect**: Drag and drop any log file. The AI-ready registry detects and normalizes it on the fly.
+- **Interactive Visualization**: ECharts-powered timeline brushing to filter events interactively.
 
-- **`web/`**: Interactive web dashboard and landing page (SvelteKit, Vite, Tailwind CSS v4, ECharts).
+---
+
+## 📂 Workspace Structure
+
+- **`web/`**: Interactive web dashboard and landing page (SvelteKit, Svelte 5 Runes, Vite, Tailwind CSS v4, ECharts).
 - **`helios-core`**: Core data models (such as `UniversalEvent`) and shared types.
 - **`helios-parser`**: Parser traits, registry, and metadata definitions.
 - **`helios-detector`**: Automatic log format detection engine.
-- **`helios-enrichment`**: Context enrichment pipeline (e.g., GeoIP, threat intel, user metadata).
-- **`helios-ingest`**: Log ingestion pipelines and sources.
-- **`helios-storage`**: Storage layer and persistence backends.
-- **`helios-api`**: Axum-based high-performance REST API with CORS and endpoints for detection, parsing, normalization, and stats.
+- **`helios-ingest`**: Log ingestion pipelines and sources (e.g., File, Evtx, Stdout).
+- **`helios-api`**: Axum-based high-performance REST API with endpoints for uploading, stats, and SSE streaming.
 - **`helios-cli`**: Command-line interface for running format detection, parsing, normalization, and starting the API server.
-- **`parsers/`**: Modular parser plugins:
-  - `helios-parser-syslog`: RFC 3164 (BSD syslog) and RFC 5424 syslog parser.
-  - `helios-parser-json`: Structured JSON log parser.
-  - `helios-parser-apache`: Apache Common/Combined access log parser.
-  - `helios-parser-nginx`: Nginx access log parser.
-  - `helios-parser-cef`: Common Event Format (CEF) log parser.
-  - `helios-parser-zookeeper`: Apache ZooKeeper log parser.
-  - `helios-parser-spark`: Apache Spark log parser.
-  - `helios-parser-windows`: Windows CBS / application log parser.
-  - `helios-parser-android`: Android logcat (threadtime format) parser.
-  - `helios-parser-openssh`: OpenSSH authentication and server log parser.
-  - `helios-parser-proxifier`: Proxifier client proxy log parser.
-
+- **`parsers/`**: Modular parser plugins for Syslog, JSON, Apache, Nginx, CEF, ZooKeeper, Spark, Windows (EVTX), Android Logcat, OpenSSH, and Proxifier.
 
 ---
 
-## Prerequisites & Installation
+## 🛠️ Prerequisites & Installation
 
 ### 1. Install Rust & Cargo
 
@@ -53,7 +47,7 @@ Make sure [Node.js](https://nodejs.org/) (v20+) is installed.
 
 ---
 
-## Running the Application
+## ⚡ Running the Application
 
 ### Option A: Run Full Stack (Backend API + Frontend UI)
 
@@ -86,18 +80,6 @@ Run the parser on any log file using the CLI. The detector will automatically id
 cargo run -p helios-cli -- parse --file <path-to-log-file>
 ```
 
-*Or with the short flag `-f`:*
-
-```bash
-cargo run -p helios-cli -- parse -f <path-to-log-file>
-```
-
-*When testing, you can redirect the output to a text file:*
-
-```bash
-cargo run --p helios-cli parse --file <input-log-file> > <output-file.txt>
-```
-
 #### 2. Format Detection Only
 Detect the format of a log file without parsing the full event payload:
 
@@ -105,69 +87,46 @@ Detect the format of a log file without parsing the full event payload:
 cargo run -p helios-cli -- detect --file <path-to-log-file>
 ```
 
-#### 3. Normalize Logs
-Normalize logs into the standard `UniversalEvent` schema:
-
-```bash
-cargo run -p helios-cli -- normalize --file <path-to-log-file>
-```
-
 ---
 
-## REST API Endpoints
+## 🌐 REST API Endpoints
 
 When running `cargo run -p helios-cli -- serve --port 8080`:
 
 | Method | Endpoint | Description |
 | :--- | :--- | :--- |
-| `GET` | `/api/v1/health` | Health check & service version |
-| `GET` | `/api/v1/parsers` | List registered parser plugins & metadata |
-| `POST` | `/api/v1/detect` | Detect log format (`{ "log": "<raw_log>" }`) |
-| `POST` | `/api/v1/parse` | Parse raw log into `UniversalEvent` |
-| `POST` | `/api/v1/normalize` | Detect, parse, and enrich into normalized event |
 | `GET` | `/api/v1/stats` | System statistics & active parsers |
+| `GET` | `/api/v1/stream` | Server-Sent Events (SSE) live feed of normalized logs |
+| `POST` | `/api/v1/events` | Ingest live raw log events |
+| `POST` | `/api/v1/upload` | Upload a static file (e.g., `.evtx`, `.log`) for instant parsing and JSON extraction |
 
 ---
 
-## Development & Testing
+## 🧪 Development & Testing
 
 ### Build the Rust Workspace
-
 ```bash
 cargo build
 ```
 
 ### Run Rust Tests
-
 ```bash
 cargo test
 ```
 
 ### Linting & Formatting
-
 ```bash
 cargo clippy -- -D warnings
 cargo fmt -- --check
 ```
 
-### Build Frontend Bundle
-
-```bash
-cd web
-npm run build
-```
-
 ---
 
-## Citation
+## 📚 Citation
 
 The dataset is from loghub: 
 + **Loghub**: Jieming Zhu, Shilin He, Pinjia He, Jinyang Liu, Michael R. Lyu. [Loghub: A Large Collection of System Log Datasets for AI-driven Log Analytics](https://arxiv.org/abs/2008.06448). IEEE International Symposium on Software Reliability Engineering (ISSRE), 2023.
 + **Loghub-2.0**: Zhihan Jiang, Jinyang Liu, Junjie Huang, Yichen Li, Yintong Huo, Jiazhen Gu, Zhuangbin Chen, Jieming Zhu, Michael R. Lyu. [A Large-scale Evaluation for Log Parsing Techniques: How Far are We?](https://arxiv.org/abs/2308.10828). ACM SIGSOFT International Symposium on Software Testing and Analysis (ISSTA), 2024.
 
-
 ---
 
-## License
-
-MIT / Apache-2.0
