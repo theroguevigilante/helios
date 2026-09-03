@@ -24,7 +24,7 @@
 
     const counts: Record<string, number> = {};
     for (const ev of events) {
-      const sev = ev.severity || 'Unknown';
+      const sev = ev.severity || '—';
       counts[sev] = (counts[sev] || 0) + 1;
     }
 

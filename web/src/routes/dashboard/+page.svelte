@@ -34,7 +34,7 @@
   let eventCount = $derived(activeSession?.events.length || 0);
   let filteredEvents = $derived((activeSession?.events || []).filter(e => {
     if (activeSession.selectedSeverity !== 'ALL') {
-      const currentSev = e.severity || 'Unknown';
+      const currentSev = e.severity || '—';
       if (currentSev !== activeSession.selectedSeverity) return false;
     }
     if (activeSession.timeRange) {

@@ -66,7 +66,7 @@
         <option value="NOTICE">Notice</option>
         <option value="INFO">Info</option>
         <option value="DEBUG">Debug</option>
-        <option value="Unknown">Unknown (Unparsed)</option>
+        <option value="—">—</option>
       </select>
     </div>
 

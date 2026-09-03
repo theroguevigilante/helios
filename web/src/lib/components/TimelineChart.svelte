@@ -71,6 +71,19 @@
   onMount(() => {
     chart = echarts.init(chartEl, undefined, { renderer: 'canvas' });
     
+    chart.on('click', (params: any) => {
+      if (params.componentType === 'series') {
+        const t = fullTimestamps[params.dataIndex];
+        if (t) {
+          if (timeRange && timeRange[0] === t && timeRange[1] === t) {
+            if (onTimeRangeSelect) onTimeRangeSelect(null);
+          } else {
+            if (onTimeRangeSelect) onTimeRangeSelect([t, t]);
+          }
+        }
+      }
+    });
+
     chart.on('brushEnd', (params: any) => {
       if (!params.areas || params.areas.length === 0) {
         if (onTimeRangeSelect) onTimeRangeSelect(null);
