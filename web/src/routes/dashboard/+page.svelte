@@ -33,7 +33,10 @@
   // Derived state for the active session
   let eventCount = $derived(activeSession?.events.length || 0);
   let filteredEvents = $derived((activeSession?.events || []).filter(e => {
-    if (activeSession.selectedSeverity !== 'ALL' && e.severity !== activeSession.selectedSeverity) return false;
+    if (activeSession.selectedSeverity !== 'ALL') {
+      const currentSev = e.severity || 'Unknown';
+      if (currentSev !== activeSession.selectedSeverity) return false;
+    }
     if (activeSession.timeRange) {
       const t = e.timestamp.slice(0, 19);
       if (t < activeSession.timeRange[0] || t > activeSession.timeRange[1]) return false;
@@ -258,11 +261,11 @@
       <div class="h-6 w-px bg-helios-border"></div>
 
       <div class="flex items-center gap-4 text-xs font-mono text-helios-muted">
-        <div>Session: <span class="text-helios-text">{eventCount}</span></div>
+        <div>Logs: <span class="text-helios-text">{eventCount}</span></div>
         {#if activeSession.type === 'live'}
           <div>Rate: <span class="text-helios-text">{eventsPerSec}</span>/s</div>
         {/if}
-        <div>Parsers: <span class="text-helios-text">{parserCount}</span></div>
+        <div>Active Parsers: <span class="text-helios-text">{parserCount}</span></div>
       </div>
     </div>
   </header>
@@ -331,7 +334,16 @@
         </div>
         <div class="h-64 p-4 border rounded-xl border-helios-border bg-helios-surface shadow-sm">
           <h3 class="mb-3 text-xs font-bold tracking-wider text-helios-muted uppercase">Severity Distribution</h3>
-          <SeverityChart events={filteredEvents} />
+          <SeverityChart 
+            events={filteredEvents} 
+            onSeveritySelect={(sev) => {
+              if (sessions[activeIndex].selectedSeverity === sev) {
+                sessions[activeIndex].selectedSeverity = 'ALL';
+              } else {
+                sessions[activeIndex].selectedSeverity = sev;
+              }
+            }} 
+          />
         </div>
       </div>
 

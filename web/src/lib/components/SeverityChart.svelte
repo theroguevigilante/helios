@@ -6,7 +6,7 @@
     severity: string | null;
   }
 
-  let { events }: { events: Event[] } = $props();
+  let { events, onSeveritySelect }: { events: Event[], onSeveritySelect?: (sev: string) => void } = $props();
   let chartEl: HTMLDivElement;
   let chart: echarts.ECharts;
 
@@ -24,7 +24,7 @@
 
     const counts: Record<string, number> = {};
     for (const ev of events) {
-      const sev = ev.severity ?? '—';
+      const sev = ev.severity || 'Unknown';
       counts[sev] = (counts[sev] || 0) + 1;
     }
 
@@ -51,6 +51,13 @@
 
   onMount(() => {
     chart = echarts.init(chartEl, undefined, { renderer: 'canvas' });
+    
+    chart.on('click', (params: any) => {
+      if (onSeveritySelect && params.name) {
+        onSeveritySelect(params.name);
+      }
+    });
+
     updateChart(events);
 
     const observer = new ResizeObserver(() => chart?.resize());
