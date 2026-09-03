@@ -6,9 +6,10 @@
     timestamp: string;
   }
 
-  let { events }: { events: Event[] } = $props();
+  let { events, onTimeRangeSelect }: { events: Event[], onTimeRangeSelect?: (range: [string, string] | null) => void } = $props();
   let chartEl: HTMLDivElement;
   let chart: echarts.ECharts;
+  let fullTimestamps: string[] = []; // Keep the original ISO strings
 
   function updateChart(events: Event[]) {
     if (!chart) return;
@@ -21,13 +22,19 @@
     }
 
     const sorted = Object.entries(buckets).sort(([a], [b]) => a.localeCompare(b));
+    fullTimestamps = sorted.map(([t]) => t); // The full YYYY-MM-DDTHH:mm:ss
 
     chart.setOption({
       tooltip: { trigger: 'axis', backgroundColor: '#1a1a26', borderColor: '#2a2a3a', textStyle: { color: '#e4e4ef' } },
       grid: { top: 10, right: 16, bottom: 24, left: 40 },
+      brush: {
+        toolbox: ['lineX', 'clear'],
+        xAxisIndex: 'all',
+        outOfBrush: { colorAlpha: 0.1 }
+      },
       xAxis: {
         type: 'category',
-        data: sorted.map(([t]) => t.slice(11)),
+        data: sorted.map(([t]) => t.slice(11)), // show only HH:mm:ss on axis
         axisLabel: { color: '#8888a0', fontSize: 10 },
         axisLine: { lineStyle: { color: '#2a2a3a' } }
       },
@@ -49,6 +56,26 @@
 
   onMount(() => {
     chart = echarts.init(chartEl, undefined, { renderer: 'canvas' });
+    
+    chart.on('brushEnd', (params: any) => {
+      if (!params.areas || params.areas.length === 0) {
+        if (onTimeRangeSelect) onTimeRangeSelect(null);
+        return;
+      }
+      
+      const area = params.areas[0];
+      const range = area.coordRange;
+      
+      if (!range || range.length < 2) return;
+      
+      const startIndex = Math.max(0, Math.floor(range[0]));
+      const endIndex = Math.min(fullTimestamps.length - 1, Math.ceil(range[1]));
+      
+      if (onTimeRangeSelect && fullTimestamps[startIndex] && fullTimestamps[endIndex]) {
+        onTimeRangeSelect([fullTimestamps[startIndex], fullTimestamps[endIndex]]);
+      }
+    });
+
     updateChart(events);
 
     const observer = new ResizeObserver(() => chart?.resize());
@@ -66,4 +93,4 @@
   });
 </script>
 
-<div bind:this={chartEl} class="w-full h-48"></div>
+<div bind:this={chartEl} class="w-full h-full min-h-[160px]"></div>
