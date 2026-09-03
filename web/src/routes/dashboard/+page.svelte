@@ -8,7 +8,7 @@
   import { createVirtualizer } from '@tanstack/svelte-virtual';
 
   let events = $state<ParsedEvent[]>([]);
-  let isConnected = $state(false);
+  let connectionState = $state<'connecting' | 'connected' | 'disconnected'>('connecting');
   let isPaused = $state(false);
   let displayTimezone = $state<'Local' | 'UTC'>('Local');
   let queuedEvents: ParsedEvent[] = [];
@@ -87,11 +87,11 @@
     eventSource = new EventSource('http://localhost:8080/api/v1/stream');
     
     eventSource.onopen = () => {
-      isConnected = true;
+      connectionState = 'connected';
     };
     
     eventSource.onerror = () => {
-      isConnected = false;
+      connectionState = 'disconnected';
     };
 
     eventSource.onmessage = (e) => {
@@ -198,8 +198,10 @@
       <div class="h-6 w-px bg-helios-border"></div>
       
       <div class="flex items-center gap-2 px-3 py-1.5 rounded bg-helios-surface-2 border border-helios-border">
-        <span class="w-2 h-2 rounded-full {isConnected ? 'bg-helios-green animate-pulse' : 'bg-helios-red'}"></span>
-        <span class="text-xs font-semibold text-helios-muted uppercase tracking-wider">{isConnected ? 'Live' : 'Offline'}</span>
+        <span class="w-2 h-2 rounded-full {connectionState === 'connected' ? 'bg-helios-green animate-pulse' : connectionState === 'connecting' ? 'bg-amber-400 animate-pulse' : 'bg-helios-red'}"></span>
+        <span class="text-xs font-semibold text-helios-muted uppercase tracking-wider">
+          {connectionState === 'connected' ? 'Live' : connectionState === 'connecting' ? 'Connecting...' : 'Offline'}
+        </span>
       </div>
       
       <div class="h-6 w-px bg-helios-border"></div>
