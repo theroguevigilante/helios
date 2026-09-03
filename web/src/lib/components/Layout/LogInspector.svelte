@@ -1,14 +1,18 @@
 <script lang="ts">
   import type { ParsedEvent } from '$lib/types';
 
-  let { event, onClose } = $props<{
+  let { event, onClose, displayTimezone = 'Local' } = $props<{
     event: ParsedEvent | null;
     onClose: () => void;
+    displayTimezone?: 'Local' | 'UTC';
   }>();
 
   function formatTime(iso: string) {
     if (!iso) return '—';
-    return new Date(iso).toLocaleString();
+    const d = new Date(iso);
+    return displayTimezone === 'UTC' 
+      ? d.toLocaleString('en-US', { timeZone: 'UTC', hour12: false }) + ' UTC'
+      : d.toLocaleString();
   }
 
   function severityBg(sev: string | null): string {

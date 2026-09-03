@@ -10,6 +10,7 @@
   let events = $state<ParsedEvent[]>([]);
   let isConnected = $state(false);
   let isPaused = $state(false);
+  let displayTimezone = $state<'Local' | 'UTC'>('Local');
   let queuedEvents: ParsedEvent[] = [];
   
   let searchQuery = $state('');
@@ -211,6 +212,22 @@
     </div>
     
     <div class="flex items-center gap-4 text-sm">
+      <div class="flex items-center gap-2">
+        <select bind:value={displayTimezone} class="px-2 py-1 text-xs font-semibold rounded bg-helios-surface-2 border border-helios-border text-helios-text focus:outline-none focus:border-helios-accent/50 cursor-pointer">
+          <option value="Local">Local Time</option>
+          <option value="UTC">UTC</option>
+        </select>
+        <div class="relative group flex items-center justify-center cursor-help">
+          <div class="w-5 h-5 rounded-full border border-helios-border text-helios-muted hover:text-helios-accent hover:border-helios-accent flex items-center justify-center text-xs font-bold transition-colors">?</div>
+          <div class="absolute top-full right-0 mt-2 w-64 p-3 text-xs rounded shadow-xl bg-helios-surface border border-helios-border text-helios-text opacity-0 group-hover:opacity-100 pointer-events-none transition-opacity z-50">
+            <strong>Timezone Converter</strong><br/>
+            Logs are ingested and stored in UTC. This toggle changes how timestamps are displayed across the dashboard (Charts, Grid, and Inspector).
+          </div>
+        </div>
+      </div>
+      
+      <div class="h-6 w-px bg-helios-border"></div>
+      
       <div class="flex items-center gap-2 px-3 py-1.5 rounded bg-helios-surface-2 border border-helios-border">
         <span class="w-2 h-2 rounded-full {isConnected ? 'bg-helios-green animate-pulse' : 'bg-helios-red'}"></span>
         <span class="text-xs font-semibold text-helios-muted uppercase tracking-wider">{isConnected ? 'Live' : 'Offline'}</span>
@@ -268,7 +285,7 @@
       <div class="grid grid-cols-1 gap-4 p-4 lg:grid-cols-2 shrink-0 border-b border-helios-border">
         <div class="h-64 p-4 border rounded-xl border-helios-border bg-helios-surface shadow-sm">
           <h3 class="mb-3 text-xs font-bold tracking-wider text-helios-muted uppercase">Events Over Time</h3>
-          <TimelineChart events={filteredEvents} onTimeRangeSelect={(r) => timeRange = r} />
+          <TimelineChart events={filteredEvents} {displayTimezone} onTimeRangeSelect={(r) => timeRange = r} />
         </div>
         <div class="h-64 p-4 border rounded-xl border-helios-border bg-helios-surface shadow-sm">
           <h3 class="mb-3 text-xs font-bold tracking-wider text-helios-muted uppercase">Severity Distribution</h3>
@@ -301,7 +318,7 @@
                 onclick={() => selectedEvent = event} role="button" tabindex="0" onkeydown={(e) => e.key === 'Enter' && (selectedEvent = event)}
               >
                 <div class="w-44 shrink-0 font-mono text-xs text-helios-muted truncate pr-2">
-                  {new Date(event.timestamp).toLocaleTimeString()}
+                  {displayTimezone === 'UTC' ? new Date(event.timestamp).toLocaleTimeString('en-US', { timeZone: 'UTC', hour12: false }) : new Date(event.timestamp).toLocaleTimeString()}
                 </div>
                 <div class="w-24 shrink-0 pr-2">
                   <span class="px-2 py-0.5 text-[10px] uppercase font-bold border rounded {severityBg(event.severity)}">
@@ -325,6 +342,6 @@
     </main>
 
     <!-- Right Drawer (Log Inspector) -->
-    <LogInspector event={selectedEvent} onClose={() => selectedEvent = null} />
+    <LogInspector event={selectedEvent} {displayTimezone} onClose={() => selectedEvent = null} />
   </div>
 </div>

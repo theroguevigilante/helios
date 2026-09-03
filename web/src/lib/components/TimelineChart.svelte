@@ -6,12 +6,12 @@
     timestamp: string;
   }
 
-  let { events, onTimeRangeSelect }: { events: Event[], onTimeRangeSelect?: (range: [string, string] | null) => void } = $props();
+  let { events, displayTimezone = 'Local', onTimeRangeSelect }: { events: Event[], displayTimezone?: 'Local' | 'UTC', onTimeRangeSelect?: (range: [string, string] | null) => void } = $props();
   let chartEl: HTMLDivElement;
   let chart: echarts.ECharts;
   let fullTimestamps: string[] = []; // Keep the original ISO strings
 
-  function updateChart(events: Event[]) {
+  function updateChart(events: Event[], tz: 'Local' | 'UTC') {
     if (!chart) return;
 
     // Bucket events by second
@@ -42,7 +42,7 @@
       },
       xAxis: {
         type: 'category',
-        data: sorted.map(([t]) => new Date(t + 'Z').toLocaleTimeString()), // match user's local timezone
+        data: sorted.map(([t]) => tz === 'UTC' ? new Date(t + 'Z').toLocaleTimeString('en-US', { timeZone: 'UTC', hour12: false }) : new Date(t + 'Z').toLocaleTimeString()),
         axisLabel: { color: '#8888a0', fontSize: 10, hideOverlap: true },
         axisLine: { lineStyle: { color: '#2a2a3a' } }
       },
@@ -90,7 +90,7 @@
       }
     });
 
-    updateChart(events);
+    updateChart(events, displayTimezone);
 
     const observer = new ResizeObserver(() => chart?.resize());
     observer.observe(chartEl);
@@ -103,7 +103,7 @@
 
   $effect(() => {
     events;
-    updateChart(events);
+    updateChart(events, displayTimezone);
   });
 </script>
 
