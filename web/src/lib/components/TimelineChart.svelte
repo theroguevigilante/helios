@@ -6,7 +6,7 @@
     timestamp: string;
   }
 
-  let { events, displayTimezone = 'Local', onTimeRangeSelect }: { events: Event[], displayTimezone?: 'Local' | 'UTC', onTimeRangeSelect?: (range: [string, string] | null) => void } = $props();
+  let { events, displayTimezone = 'Local', timeRange = null, onTimeRangeSelect }: { events: Event[], displayTimezone?: 'Local' | 'UTC', timeRange?: [string, string] | null, onTimeRangeSelect?: (range: [string, string] | null) => void } = $props();
   let chartEl: HTMLDivElement;
   let chart: echarts.ECharts;
   let fullTimestamps: string[] = []; // Keep the original ISO strings
@@ -26,12 +26,12 @@
 
     chart.setOption({
       tooltip: { trigger: 'axis', backgroundColor: '#1a1a26', borderColor: '#2a2a3a', textStyle: { color: '#e4e4ef' } },
-      grid: { top: 30, right: 16, bottom: 40, left: 40 },
+      grid: { top: 40, right: 16, bottom: 40, left: 40 },
             toolbox: {
         feature: {
           brush: { type: ['lineX', 'clear'] }
         },
-        top: 0,
+        top: -5,
         right: 10,
         iconStyle: { borderColor: '#8888a0' }
       },

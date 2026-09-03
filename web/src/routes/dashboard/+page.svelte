@@ -131,6 +131,13 @@
     selectedEvent = null;
   }
 
+  function resetFilters() {
+    sessions[activeIndex].searchQuery = '';
+    sessions[activeIndex].selectedSeverity = 'ALL';
+    sessions[activeIndex].timeRange = null;
+    selectedEvent = null;
+  }
+
   function closeSession(id: string) {
     if (id === 'live') return; // Cannot close live feed
     sessions = sessions.filter(s => s.id !== id);
@@ -250,6 +257,9 @@
             {/if}
           </button>
         {/if}
+        <button onclick={resetFilters} class="px-3 py-1.5 text-xs font-semibold rounded bg-helios-surface-2 border border-helios-border hover:bg-helios-border text-helios-text transition-colors flex items-center gap-2">
+          <svg class="w-3 h-3 text-helios-muted" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" /></svg> Reset
+        </button>
         <button onclick={clearStream} class="px-3 py-1.5 text-xs font-semibold rounded bg-helios-surface-2 border border-helios-border hover:bg-helios-border text-helios-text transition-colors flex items-center gap-2">
           <svg class="w-3 h-3 text-helios-red" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" /></svg> Clear
         </button>
@@ -330,7 +340,7 @@
       <div class="grid grid-cols-1 gap-4 p-4 lg:grid-cols-2 shrink-0 border-b border-helios-border">
         <div class="h-64 p-4 border rounded-xl border-helios-border bg-helios-surface shadow-sm">
           <h3 class="mb-3 text-xs font-bold tracking-wider text-helios-muted uppercase">Events Over Time</h3>
-          <TimelineChart events={filteredEvents} {displayTimezone} onTimeRangeSelect={(r) => sessions[activeIndex].timeRange = r} />
+          <TimelineChart events={filteredEvents} {displayTimezone} timeRange={sessions[activeIndex].timeRange} onTimeRangeSelect={(r) => sessions[activeIndex].timeRange = r} />
         </div>
         <div class="h-64 p-4 border rounded-xl border-helios-border bg-helios-surface shadow-sm">
           <h3 class="mb-3 text-xs font-bold tracking-wider text-helios-muted uppercase">Severity Distribution</h3>
