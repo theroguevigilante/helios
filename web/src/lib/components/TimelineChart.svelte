@@ -26,7 +26,7 @@
 
     chart.setOption({
       tooltip: { trigger: 'axis', backgroundColor: '#1a1a26', borderColor: '#2a2a3a', textStyle: { color: '#e4e4ef' } },
-      grid: { top: 30, right: 16, bottom: 24, left: 40 },
+      grid: { top: 30, right: 16, bottom: 40, left: 40 },
             toolbox: {
         feature: {
           brush: { type: ['lineX', 'clear'] }
@@ -42,8 +42,8 @@
       },
       xAxis: {
         type: 'category',
-        data: sorted.map(([t]) => t.slice(11)), // show only HH:mm:ss on axis
-        axisLabel: { color: '#8888a0', fontSize: 10 },
+        data: sorted.map(([t]) => new Date(t + 'Z').toLocaleTimeString()), // match user's local timezone
+        axisLabel: { color: '#8888a0', fontSize: 10, hideOverlap: true },
         axisLine: { lineStyle: { color: '#2a2a3a' } }
       },
       yAxis: {
