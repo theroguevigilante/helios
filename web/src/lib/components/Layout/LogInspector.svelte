@@ -2,6 +2,7 @@
   import { onMount } from 'svelte';
   import type { ParsedEvent } from '$lib/types';
   import { chatHistoryStore, type ChatMessage } from '$lib/ai';
+  import { marked } from 'marked';
 
   let { event, onClose, displayTimezone = 'Local' } = $props<{
     event: ParsedEvent | null;
@@ -31,6 +32,7 @@
 
   let aiMode = $state<'idle' | 'warning' | 'chat'>('idle');
   let provider = $state('gemini');
+  let modelName = $state('gemini-1.5-flash');
   let apiKey = $state('');
   let chatInput = $state('');
   let isGenerating = $state(false);
@@ -54,6 +56,11 @@
   function switchProvider(p: string) {
     provider = p;
     apiKey = localStorage.getItem(`helios_ai_key_${p}`) || '';
+    if (p === 'gemini') modelName = 'gemini-1.5-flash';
+    else if (p === 'openai') modelName = 'gpt-3.5-turbo';
+    else if (p === 'groq') modelName = 'llama3-8b-8192';
+    else if (p === 'openrouter') modelName = 'meta-llama/llama-3.1-8b-instruct:free';
+    else if (p === 'ollama') modelName = 'llama3';
     saveSettings();
   }
 
@@ -95,25 +102,29 @@ USER QUERY: ${text}`;
         messages.push({ role: 'user', content: prompt });
 
         if (provider === 'gemini') {
-            const res = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${apiKey}`, {
+            const res = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${modelName}:generateContent?key=${apiKey}`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ contents: [{ parts: [{ text: prompt }] }] })
             });
-            if (!res.ok) throw new Error('API Error');
+            if (!res.ok) {
+                const errData = await res.json().catch(() => ({}));
+                throw new Error(errData.error?.message || `HTTP ${res.status} API Error`);
+            }
             const data = await res.json();
+            if (!data.candidates || !data.candidates[0].content) {
+                throw new Error("Safety blocked or invalid response from Gemini API.");
+            }
             reply = data.candidates[0].content.parts[0].text;
 
         } else if (provider === 'openai' || provider === 'groq' || provider === 'openrouter') {
             let endpoint = 'https://api.openai.com/v1/chat/completions';
-            let model = 'gpt-4o-mini';
+            let model = modelName;
             
             if (provider === 'groq') {
                 endpoint = 'https://api.groq.com/openai/v1/chat/completions';
-                model = 'llama3-8b-8192';
             } else if (provider === 'openrouter') {
                 endpoint = 'https://openrouter.ai/api/v1/chat/completions';
-                model = 'meta-llama/llama-3.1-8b-instruct:free';
             }
 
             const headers: Record<string, string> = {
@@ -131,7 +142,10 @@ USER QUERY: ${text}`;
                 headers,
                 body: JSON.stringify({ model, messages })
             });
-            if (!res.ok) throw new Error('API Error');
+            if (!res.ok) {
+                const errData = await res.json().catch(() => ({}));
+                throw new Error(errData.error?.message || `HTTP ${res.status} API Error`);
+            }
             const data = await res.json();
             reply = data.choices[0].message.content;
 
@@ -139,7 +153,7 @@ USER QUERY: ${text}`;
             const res = await fetch('http://localhost:11434/api/chat', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ model: 'llama3', messages, stream: false })
+                body: JSON.stringify({ model: modelName, messages, stream: false })
             });
             if (!res.ok) throw new Error('API Error');
             const data = await res.json();
@@ -147,8 +161,9 @@ USER QUERY: ${text}`;
         }
 
         chatHistoryStore.update(h => [...h, { role: 'model', text: reply }]);
-    } catch (e) {
-        chatHistoryStore.update(h => [...h, { role: 'model', text: "Error: Could not connect to API." }]);
+    } catch (e: any) {
+        console.error("AI Chat Error:", e);
+        chatHistoryStore.update(h => [...h, { role: 'model', text: `API Error: ${e.message || 'Check console for details.'}` }]);
     } finally {
         isGenerating = false;
     }
@@ -260,18 +275,21 @@ USER QUERY: ${text}`;
             <select class="bg-[#11111a] border border-purple-500/30 text-purple-300 text-xs rounded px-2 py-1 outline-none flex-1" value={provider} onchange={(e) => switchProvider(e.currentTarget.value)}>
               <option value="gemini">Google Gemini</option>
               <option value="groq">Groq (Llama 3)</option>
-              <option value="openai">OpenAI (GPT-4o)</option>
-              <option value="openrouter">OpenRouter (Free Llama 3.1)</option>
+              <option value="openai">OpenAI (GPT-4o/3.5)</option>
+              <option value="openrouter">OpenRouter</option>
               <option value="ollama">Ollama (Local)</option>
             </select>
             <button class="px-2 py-1 bg-purple-500/10 text-purple-400 border border-purple-500/30 rounded text-xs hover:bg-purple-500/20" onclick={() => chatHistoryStore.set([])}>
               Clear Chat
             </button>
           </div>
-          {#if provider !== 'ollama'}
-            <input type="password" placeholder="Enter {provider.toUpperCase()} API Key" bind:value={apiKey} onchange={saveSettings}
-              class="w-full bg-[#11111a] border border-purple-500/30 rounded px-2 py-1 text-xs text-helios-text focus:outline-none focus:border-purple-500/60" />
-          {/if}
+          <div class="flex gap-2">
+            <input type="text" placeholder="Model Name" bind:value={modelName} class="w-1/3 bg-[#11111a] border border-purple-500/30 rounded px-2 py-1 text-xs text-purple-300 focus:outline-none focus:border-purple-500/60" title="Model ID" />
+            {#if provider !== 'ollama'}
+              <input type="password" placeholder="Enter {provider.toUpperCase()} API Key" bind:value={apiKey} onchange={saveSettings}
+                class="flex-1 bg-[#11111a] border border-purple-500/30 rounded px-2 py-1 text-xs text-helios-text focus:outline-none focus:border-purple-500/60" />
+            {/if}
+          </div>
         </div>
 
         <div class="flex-1 p-4 overflow-y-auto space-y-4 flex flex-col">
@@ -291,7 +309,13 @@ USER QUERY: ${text}`;
               <strong class="{msg.role === 'model' ? 'text-purple-400' : 'text-helios-muted'} block mb-1 text-xs uppercase tracking-wider">
                 {msg.role === 'model' ? 'AI Assistant' : 'You'}
               </strong>
-              <div class="whitespace-pre-wrap text-xs">{msg.text}</div>
+              {#if msg.role === 'model'}
+                <div class="prose prose-invert prose-sm max-w-none text-xs text-purple-300 prose-pre:bg-[#0a0a0f] prose-pre:border prose-pre:border-purple-500/30 prose-a:text-purple-400 prose-p:leading-relaxed prose-code:text-purple-200">
+                  {@html marked.parse(msg.text)}
+                </div>
+              {:else}
+                <div class="whitespace-pre-wrap text-xs">{msg.text}</div>
+              {/if}
             </div>
           {/each}
 
