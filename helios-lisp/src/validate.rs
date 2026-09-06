@@ -63,9 +63,10 @@ pub fn validate_script(path: &Path) -> anyhow::Result<ValidationResult> {
     }
 
     // 4. (parse ...) check
-    match engine
-        .call_function_by_name_with_args("parse", vec![SteelVal::StringV("dummy dummy dummy dummy dummy".into())])
-    {
+    match engine.call_function_by_name_with_args(
+        "parse",
+        vec![SteelVal::StringV("dummy dummy dummy dummy dummy".into())],
+    ) {
         Ok(val) => match val {
             SteelVal::HashMapV(_) => {}
             _ => errors
