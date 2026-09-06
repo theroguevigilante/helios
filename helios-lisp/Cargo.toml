@@ -1,0 +1,19 @@
+[package]
+name = "helios-lisp"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+helios-core = { path = "../helios-core" }
+helios-parser = { path = "../helios-parser" }
+steel-core = "0.8"
+chrono = { workspace = true }
+regex = { workspace = true }
+anyhow = { workspace = true }
+tracing = { workspace = true }
+serde_json = { workspace = true }
+notify = { version = "6", features = ["macos_fsevent"] }
+dirs = "5"
+
+[dev-dependencies]
+tempfile = "3"

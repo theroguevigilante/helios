@@ -44,7 +44,22 @@ impl Registry {
         self.parsers.push(Box::new(parser));
     }
 
+    /// Register a pre-boxed parser (used by the Lisp loader).
+    pub fn register_boxed(&mut self, parser: Box<dyn Parser>) {
+        self.parsers.push(parser);
+    }
+
     pub fn parsers(&self) -> &[Box<dyn Parser>] {
         &self.parsers
+    }
+
+    /// Returns the number of registered parsers.
+    pub fn len(&self) -> usize {
+        self.parsers.len()
+    }
+
+    /// Returns true if no parsers are registered.
+    pub fn is_empty(&self) -> bool {
+        self.parsers.is_empty()
     }
 }
