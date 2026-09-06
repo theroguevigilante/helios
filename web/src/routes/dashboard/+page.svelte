@@ -85,7 +85,7 @@
       }
     }, 1000);
 
-    fetch('http://localhost:8080/api/v1/stats')
+    fetch('/api/v1/stats')
       .then(r => r.json())
       .then(d => {
         parserCount = d.parsers.length;
@@ -100,7 +100,7 @@
 
   function connectStream() {
     if (eventSource) eventSource.close();
-    eventSource = new EventSource('http://localhost:8080/api/v1/stream');
+    eventSource = new EventSource('/api/v1/stream');
     
     eventSource.onopen = () => connectionState = 'connected';
     eventSource.onerror = () => connectionState = 'disconnected';
@@ -150,7 +150,7 @@
     const formData = new FormData();
     formData.append('file', file);
     try {
-      const res = await fetch('http://localhost:8080/api/v1/upload', {
+      const res = await fetch('/api/v1/upload', {
         method: 'POST',
         body: formData
       });
