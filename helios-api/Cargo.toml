@@ -10,6 +10,9 @@ tokio.workspace = true
 serde.workspace = true
 serde_json.workspace = true
 tower-http = { workspace = true }
+helios-storage = { path = "../helios-storage" }
+helios-lisp = { path = "../helios-lisp" }
+dirs = { workspace = true }
 helios-core = { path = "../helios-core" }
 helios-parser = { path = "../helios-parser" }
 helios-detector = { path = "../helios-detector" }

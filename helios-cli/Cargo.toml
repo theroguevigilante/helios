@@ -7,6 +7,8 @@ edition = "2021"
 serde_json.workspace = true
 helios-core = { path = "../helios-core" }
 helios-parser = { path = "../helios-parser" }
+helios-lisp = { path = "../helios-lisp" }
+dirs = { workspace = true }
 helios-detector = { path = "../helios-detector" }
 helios-ingest = { path = "../helios-ingest" }
 helios-enrichment = { path = "../helios-enrichment" }

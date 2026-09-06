@@ -1,6 +1,7 @@
 use clap::{Parser, Subcommand};
 use helios_detector::FormatDetector;
 use helios_ingest::{EvtxFileSource, LogSource};
+use helios_lisp::{default_lisp_dir, load_lisp_parsers};
 use helios_parser::Registry;
 use helios_parser_android::AndroidParser;
 use helios_parser_apache::ApacheParser;
@@ -47,6 +48,13 @@ enum Commands {
         port: u16,
     },
     Stats,
+    /// List all registered parsers (native + Lisp extensions)
+    ListParsers,
+    /// Validate a Lisp parser script without loading it
+    ValidateParser {
+        #[arg(short, long)]
+        file: String,
+    },
 }
 
 #[tokio::main]
@@ -74,6 +82,15 @@ async fn main() -> anyhow::Result<()> {
     registry.register(ProxifierParser::new());
 
     registry.register(JsonParser::new());
+
+    // Load Lisp extensions
+    let lisp_dir = default_lisp_dir();
+    if lisp_dir.exists() {
+        for parser in load_lisp_parsers(&lisp_dir) {
+            registry.register_boxed(Box::new(parser));
+        }
+    }
+
     let detector = FormatDetector::new(&registry);
 
     match &cli.command {
@@ -220,6 +237,47 @@ async fn main() -> anyhow::Result<()> {
         }
         Commands::Stats => {
             info!("Displaying stats");
+        }
+        Commands::ListParsers => {
+            println!("{:<20} {:<10} {:<50}", "NAME", "TYPE", "DESCRIPTION");
+            println!("{}", "-".repeat(80));
+            for parser in registry.parsers() {
+                let meta = parser.metadata();
+                let ptype = if meta.author == "Lisp Extension" {
+                    "lisp"
+                } else {
+                    "native"
+                };
+                println!(
+                    "{:<20} {:<10} {:<50}",
+                    parser.name(),
+                    ptype,
+                    meta.description
+                );
+            }
+            println!("\nTotal: {} parser(s)", registry.parsers().len());
+        }
+        Commands::ValidateParser { file } => {
+            use helios_lisp::validate_script;
+            let path = std::path::Path::new(&file);
+
+            match validate_script(path) {
+                Ok(result) => {
+                    if result.is_valid {
+                        println!("✅ VALID");
+                        println!("   Parser Name: {}", result.parser_name.unwrap_or_default());
+                        for w in &result.warnings {
+                            println!("   ⚠ {}", w);
+                        }
+                    } else {
+                        println!("❌ INVALID");
+                        for e in &result.errors {
+                            println!("   ✗ {}", e);
+                        }
+                    }
+                }
+                Err(e) => println!("❌ Failed to read file: {}", e),
+            }
         }
     }
 
