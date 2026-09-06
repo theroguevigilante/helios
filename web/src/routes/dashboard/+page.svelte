@@ -7,6 +7,23 @@
   import type { ParsedEvent, Session } from '$lib/types';
   import { createVirtualizer } from '@tanstack/svelte-virtual';
 
+
+  onMount(() => {
+    const meta = document.querySelector('meta[name="viewport"]');
+    const originalContent = meta ? meta.getAttribute('content') : null;
+    
+    if (meta) {
+      meta.setAttribute('content', 'width=1280');
+    }
+
+    return () => {
+      if (meta && originalContent) {
+        meta.setAttribute('content', originalContent);
+      }
+    };
+  });
+
+
   let connectionState = $state<'connecting' | 'connected' | 'disconnected'>('connecting');
   let displayTimezone = $state<'Local' | 'UTC'>('Local');
   let parserCount = $state(0);
