@@ -7,5 +7,6 @@ FROM debian:bullseye-slim
 WORKDIR /app/data
 RUN apt-get update && apt-get install -y ca-certificates && rm -rf /var/lib/apt/lists/*
 COPY --from=builder /app/target/release/helios-cli /usr/local/bin/helios-cli
+COPY --from=builder /app/parsers/lisp ./parsers/lisp
 EXPOSE 8080
 ENTRYPOINT ["helios-cli", "serve", "--port", "8080"]

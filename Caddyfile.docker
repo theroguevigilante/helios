@@ -1,0 +1,12 @@
+:80 {
+    handle /api/* {
+        reverse_proxy backend:8080 {
+            header_up Connection ""
+        }
+    }
+    handle {
+        root * /var/www/helios
+        try_files {path} /index.html
+        file_server
+    }
+}
