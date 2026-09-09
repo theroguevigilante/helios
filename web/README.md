@@ -1,42 +1,28 @@
-# sv
+# Helios Frontend
 
-Everything you need to build a Svelte project, powered by [`sv`](https://github.com/sveltejs/cli).
+The interactive web dashboard for Helios. Built for extreme performance and smooth forensic analysis.
 
-## Creating a project
+## Tech Stack
+- **Framework**: SvelteKit (Svelte 5 Runes)
+- **Styling**: Tailwind CSS v4
+- **Charts**: Apache ECharts (Canvas-rendered for handling massive datasets)
+- **Virtualization**: `@tanstack/svelte-virtual` for infinite scrolling of millions of log events.
+- **Build Target**: Fully static SPA export (`@sveltejs/adapter-static`)
 
-If you're seeing this, you've probably already done this step. Congrats!
+## Development
 
-```sh
-# create a new project
-npx sv create my-app
-```
-
-To recreate this project with the same configuration:
-
-```sh
-# recreate this project
-npx sv@0.17.0 create --template minimal --types ts --no-install web
-```
-
-## Developing
-
-Once you've created a project and installed dependencies with `npm install` (or `pnpm install` or `yarn`), start a development server:
-
-```sh
+```bash
+npm install
 npm run dev
-
-# or start the server and open the app in a new browser tab
-npm run dev -- --open
 ```
 
-## Building
+The frontend will automatically proxy `/api/*` requests to the Rust backend running locally on `http://localhost:8080`.
 
-To create a production version of your app:
+## Production Build
 
-```sh
+To generate the static HTML/JS/CSS bundle for deployment:
+
+```bash
 npm run build
 ```
-
-You can preview the production build with `npm run preview`.
-
-> To deploy your app, you may need to install an [adapter](https://svelte.dev/docs/kit/adapters) for your target environment.
+The output will be placed in the `build/` directory, ready to be served by Caddy, Nginx, or Docker.
