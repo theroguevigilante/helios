@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="en">
+<html lang="en" class="dark">
 	<head>
 		<meta charset="utf-8" />
 		<meta name="viewport" content="width=device-width, initial-scale=1" />
@@ -7,6 +7,17 @@
 		<meta name="theme-color" content="#0a0a0f" />
 		<meta name="description" content="Helios: Universal Log Pre-processing & Observability Platform" />
 		%sveltekit.head%
+		<script>
+			try {
+				const theme = localStorage.getItem('helios-theme');
+				if (theme === 'light') {
+					document.documentElement.classList.remove('dark');
+					document.querySelector('meta[name="theme-color"]').setAttribute('content', '#f8fafc');
+				} else {
+					document.documentElement.classList.add('dark');
+				}
+			} catch (_) {}
+		</script>
 	</head>
 	<body data-sveltekit-preload-data="hover">
 		<div style="display: contents">%sveltekit.body%</div>

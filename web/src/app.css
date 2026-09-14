@@ -2,17 +2,54 @@
 @plugin '@tailwindcss/typography';
 
 @theme {
-  --color-helios-bg: #0a0a0f;
-  --color-helios-surface: #12121a;
-  --color-helios-surface-2: #1a1a26;
-  --color-helios-border: #2a2a3a;
-  --color-helios-text: #e4e4ef;
-  --color-helios-muted: #8888a0;
-  --color-helios-accent: #f59e0b;
-  --color-helios-accent-dim: #b45309;
-  --color-helios-green: #22c55e;
-  --color-helios-red: #ef4444;
-  --color-helios-blue: #3b82f6;
+  --color-helios-bg: var(--color-helios-bg-val);
+  --color-helios-surface: var(--color-helios-surface-val);
+  --color-helios-surface-2: var(--color-helios-surface-2-val);
+  --color-helios-border: var(--color-helios-border-val);
+  --color-helios-text: var(--color-helios-text-val);
+  --color-helios-muted: var(--color-helios-muted-val);
+  --color-helios-accent: var(--color-helios-accent-val);
+  --color-helios-accent-dim: var(--color-helios-accent-dim-val);
+  --color-helios-green: var(--color-helios-green-val);
+  --color-helios-red: var(--color-helios-red-val);
+  --color-helios-blue: var(--color-helios-blue-val);
 
   --font-mono: 'JetBrains Mono', 'Fira Code', monospace;
+}
+
+@layer base {
+  :root {
+    --color-helios-bg-val: #f8fafc;
+    --color-helios-surface-val: #ffffff;
+    --color-helios-surface-2-val: #f1f5f9;
+    --color-helios-border-val: #e2e8f0;
+    --color-helios-text-val: #0f172a;
+    --color-helios-muted-val: #64748b;
+    --color-helios-accent-val: #f59e0b;
+    --color-helios-accent-dim-val: #b45309;
+    --color-helios-green-val: #16a34a;
+    --color-helios-red-val: #dc2626;
+    --color-helios-blue-val: #2563eb;
+    color-scheme: light;
+  }
+  
+  :root.dark {
+    --color-helios-bg-val: #0a0a0f;
+    --color-helios-surface-val: #12121a;
+    --color-helios-surface-2-val: #1a1a26;
+    --color-helios-border-val: #2a2a3a;
+    --color-helios-text-val: #e4e4ef;
+    --color-helios-muted-val: #8888a0;
+    --color-helios-accent-val: #f59e0b;
+    --color-helios-accent-dim-val: #b45309;
+    --color-helios-green-val: #22c55e;
+    --color-helios-red-val: #ef4444;
+    --color-helios-blue-val: #3b82f6;
+    color-scheme: dark;
+  }
+
+  body {
+    background-color: var(--color-helios-bg-val);
+    color: var(--color-helios-text-val);
+  }
 }
