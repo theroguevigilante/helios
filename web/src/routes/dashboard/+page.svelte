@@ -208,12 +208,12 @@
 
   function severityBg(sev: string | null): string {
     switch (sev) {
-      case 'CRIT': return 'bg-red-500/10 border-red-500/30 text-red-400';
-      case 'ERROR': return 'bg-red-400/10 border-red-400/30 text-red-400';
-      case 'WARN': return 'bg-amber-400/10 border-amber-400/30 text-amber-400';
-      case 'NOTICE': return 'bg-blue-400/10 border-blue-400/30 text-blue-400';
-      case 'INFO': return 'bg-green-400/10 border-green-400/30 text-green-400';
-      case 'DEBUG': return 'bg-gray-400/10 border-gray-400/30 text-gray-400';
+      case 'CRIT': return 'bg-red-500/10 border-red-500/30 text-red-600 dark:text-red-400';
+      case 'ERROR': return 'bg-red-400/10 border-red-400/30 text-red-600 dark:text-red-400';
+      case 'WARN': return 'bg-amber-400/10 border-amber-400/30 text-amber-600 dark:text-amber-400';
+      case 'NOTICE': return 'bg-blue-400/10 border-blue-400/30 text-blue-600 dark:text-blue-400';
+      case 'INFO': return 'bg-green-400/10 border-green-400/30 text-green-600 dark:text-green-400';
+      case 'DEBUG': return 'bg-gray-400/10 border-gray-400/30 text-gray-600 dark:text-gray-400';
       default: return 'bg-helios-surface-2 border-helios-border text-helios-muted';
     }
   }
@@ -341,7 +341,7 @@
     <!-- Center Main Content -->
     <main class="flex flex-col flex-1 overflow-hidden relative bg-helios-bg">
       {#if uploadWarning}
-        <div class="m-4 p-4 text-sm font-semibold border rounded-lg bg-amber-500/10 border-amber-500/30 text-amber-400 flex-shrink-0">
+        <div class="m-4 p-4 text-sm font-semibold border rounded-lg bg-amber-500/10 border-amber-500/30 text-amber-600 dark:text-amber-400 flex-shrink-0">
           <div class="flex justify-between items-start">
             <span>{uploadWarning}</span>
             <button onclick={() => uploadWarning = ''} class="text-amber-500/70 hover:text-amber-500 ml-4 shrink-0" aria-label="Dismiss warning">

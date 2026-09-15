@@ -35,13 +35,13 @@
     }));
 
     chart.setOption({
-      tooltip: { trigger: 'item', backgroundColor: '#1a1a26', borderColor: '#2a2a3a', textStyle: { color: '#e4e4ef' } },
+      tooltip: { trigger: 'item', backgroundColor: 'var(--color-helios-surface-2-val)', borderColor: 'var(--color-helios-border-val)', textStyle: { color: 'var(--color-helios-text-val)' } },
       series: [
         {
           type: 'pie',
           radius: ['45%', '70%'],
           avoidLabelOverlap: false,
-          label: { show: true, color: '#8888a0', fontSize: 11 },
+          label: { show: true, color: 'var(--color-helios-muted-val)', fontSize: 11 },
           emphasis: { label: { show: true, fontSize: 14, fontWeight: 'bold' } },
           data
         }
@@ -63,7 +63,11 @@
     const observer = new ResizeObserver(() => chart?.resize());
     observer.observe(chartEl);
 
+    const onThemeChange = () => updateChart(events);
+    window.addEventListener('theme-changed', onThemeChange);
+
     return () => {
+      window.removeEventListener('theme-changed', onThemeChange);
       observer.disconnect();
       chart?.dispose();
     };

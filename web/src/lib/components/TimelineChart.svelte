@@ -25,7 +25,7 @@
     fullTimestamps = sorted.map(([t]) => t); // The full YYYY-MM-DDTHH:mm:ss
 
     chart.setOption({
-      tooltip: { trigger: 'axis', backgroundColor: '#1a1a26', borderColor: '#2a2a3a', textStyle: { color: '#e4e4ef' } },
+      tooltip: { trigger: 'axis', backgroundColor: 'var(--color-helios-surface-2-val)', borderColor: 'var(--color-helios-border-val)', textStyle: { color: 'var(--color-helios-text-val)' } },
       grid: { top: 40, right: 16, bottom: 40, left: 40 },
             toolbox: {
         feature: {
@@ -33,7 +33,7 @@
         },
         top: -5,
         right: 10,
-        iconStyle: { borderColor: '#8888a0' }
+        iconStyle: { borderColor: 'var(--color-helios-muted-val)' }
       },
       brush: {
         
@@ -43,13 +43,13 @@
       xAxis: {
         type: 'category',
         data: sorted.map(([t]) => tz === 'UTC' ? new Date(t + 'Z').toLocaleTimeString('en-US', { timeZone: 'UTC', hour12: false }) : new Date(t + 'Z').toLocaleTimeString()),
-        axisLabel: { color: '#8888a0', fontSize: 10, hideOverlap: true },
-        axisLine: { lineStyle: { color: '#2a2a3a' } }
+        axisLabel: { color: 'var(--color-helios-muted-val)', fontSize: 10, hideOverlap: true },
+        axisLine: { lineStyle: { color: 'var(--color-helios-border-val)' } }
       },
       yAxis: {
         type: 'value',
-        splitLine: { lineStyle: { color: '#2a2a3a' } },
-        axisLabel: { color: '#8888a0', fontSize: 10 }
+        splitLine: { lineStyle: { color: 'var(--color-helios-border-val)' } },
+        axisLabel: { color: 'var(--color-helios-muted-val)', fontSize: 10 }
       },
       series: [
         {
@@ -108,7 +108,11 @@
     const observer = new ResizeObserver(() => chart?.resize());
     observer.observe(chartEl);
 
+    const onThemeChange = () => updateChart(events, displayTimezone);
+    window.addEventListener('theme-changed', onThemeChange);
+
     return () => {
+      window.removeEventListener('theme-changed', onThemeChange);
       observer.disconnect();
       chart?.dispose();
     };

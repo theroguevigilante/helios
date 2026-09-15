@@ -20,12 +20,12 @@
 
   function severityBg(sev: string | null): string {
     switch (sev) {
-      case 'CRIT': return 'bg-red-500/10 border-red-500/30 text-red-400';
-      case 'ERROR': return 'bg-red-400/10 border-red-400/30 text-red-400';
-      case 'WARN': return 'bg-amber-400/10 border-amber-400/30 text-amber-400';
-      case 'NOTICE': return 'bg-blue-400/10 border-blue-400/30 text-blue-400';
-      case 'INFO': return 'bg-green-400/10 border-green-400/30 text-green-400';
-      case 'DEBUG': return 'bg-gray-400/10 border-gray-400/30 text-gray-400';
+      case 'CRIT': return 'bg-red-500/10 border-red-500/30 text-red-600 dark:text-red-400';
+      case 'ERROR': return 'bg-red-400/10 border-red-400/30 text-red-600 dark:text-red-400';
+      case 'WARN': return 'bg-amber-400/10 border-amber-400/30 text-amber-600 dark:text-amber-400';
+      case 'NOTICE': return 'bg-blue-400/10 border-blue-400/30 text-blue-600 dark:text-blue-400';
+      case 'INFO': return 'bg-green-400/10 border-green-400/30 text-green-600 dark:text-green-400';
+      case 'DEBUG': return 'bg-gray-400/10 border-gray-400/30 text-gray-600 dark:text-gray-400';
       default: return 'bg-helios-surface-2 border-helios-border text-helios-muted';
     }
   }
@@ -227,7 +227,7 @@ USER QUERY: ${text}`;
     <!-- JSON Normalized -->
     <div>
       <div class="text-xs font-semibold text-helios-muted mb-2">JSON NORMALIZED</div>
-      <pre class="p-3 overflow-x-auto text-xs rounded-lg bg-[#11111a] border border-helios-border font-mono text-green-400 whitespace-pre-wrap">{JSON.stringify({
+      <pre class="p-3 overflow-x-auto text-xs rounded-lg bg-[#11111a] border border-helios-border font-mono text-green-600 dark:text-green-400 whitespace-pre-wrap">{JSON.stringify({
         timestamp: event.timestamp,
         hostname: event.hostname,
         service: event.service,
@@ -245,7 +245,7 @@ USER QUERY: ${text}`;
           <p class="text-sm text-amber-500/80 mb-6 leading-relaxed">
             Proceeding will transmit this raw log event to an external AI provider (unless using local Ollama).
             <br/><br/>
-            Logs frequently contain <strong class="text-amber-400">sensitive PII, internal IP routing, or active credentials.</strong> 
+            Logs frequently contain <strong class="text-amber-600 dark:text-amber-400">sensitive PII, internal IP routing, or active credentials.</strong> 
             Please verify no confidential data is exposed before passing this payload to a third party.
           </p>
           <div class="flex flex-col gap-3">
@@ -259,7 +259,7 @@ USER QUERY: ${text}`;
         </div>
       </div>
     {:else if aiMode === 'chat'}
-      <div class="flex-1 flex flex-col h-full rounded-xl overflow-hidden border border-purple-500/30 bg-[#0A0A0F] shadow-[0_0_20px_rgba(168,85,247,0.1)] animate-in fade-in slide-in-from-right-4 duration-300">
+      <div class="flex-1 flex flex-col h-full rounded-xl overflow-hidden border border-purple-500/30 bg-helios-surface shadow-[0_0_20px_rgba(168,85,247,0.1)] animate-in fade-in slide-in-from-right-4 duration-300">
         <!-- Settings Header -->
         <div class="bg-purple-500/15 p-3 text-sm font-bold text-purple-400 border-b border-purple-500/30 flex justify-between items-center shrink-0">
           <span class="flex items-center gap-2">
@@ -272,7 +272,7 @@ USER QUERY: ${text}`;
         <!-- Settings Bar -->
         <div class="p-3 border-b border-purple-500/20 bg-helios-surface flex flex-col gap-2 shrink-0">
           <div class="flex gap-2">
-            <select class="bg-[#11111a] border border-purple-500/30 text-purple-300 text-xs rounded px-2 py-1 outline-none flex-1" value={provider} onchange={(e) => switchProvider(e.currentTarget.value)}>
+            <select class="bg-[#11111a] border border-purple-500/30 text-purple-700 dark:text-purple-300 text-xs rounded px-2 py-1 outline-none flex-1" value={provider} onchange={(e) => switchProvider(e.currentTarget.value)}>
               <option value="gemini">Google Gemini</option>
               <option value="groq">Groq (Llama 3)</option>
               <option value="openai">OpenAI (GPT-4o/3.5)</option>
@@ -284,7 +284,7 @@ USER QUERY: ${text}`;
             </button>
           </div>
           <div class="flex gap-2">
-            <input type="text" placeholder="Model Name" bind:value={modelName} class="w-1/3 bg-[#11111a] border border-purple-500/30 rounded px-2 py-1 text-xs text-purple-300 focus:outline-none focus:border-purple-500/60" title="Model ID" />
+            <input type="text" placeholder="Model Name" bind:value={modelName} class="w-1/3 bg-[#11111a] border border-purple-500/30 rounded px-2 py-1 text-xs text-purple-700 dark:text-purple-300 focus:outline-none focus:border-purple-500/60" title="Model ID" />
             {#if provider !== 'ollama'}
               <input type="password" placeholder="Enter {provider.toUpperCase()} API Key" bind:value={apiKey} onchange={saveSettings}
                 class="flex-1 bg-[#11111a] border border-purple-500/30 rounded px-2 py-1 text-xs text-helios-text focus:outline-none focus:border-purple-500/60" />
@@ -298,19 +298,19 @@ USER QUERY: ${text}`;
           </div>
           
           {#if chatHistory.length === 0}
-            <div class="bg-purple-500/10 p-3 rounded-lg border border-purple-500/30 text-purple-300 text-sm">
+            <div class="bg-purple-500/10 p-3 rounded-lg border border-purple-500/30 text-purple-700 dark:text-purple-300 text-sm">
               <strong class="text-purple-400 block mb-1">AI Assistant:</strong> 
               I'm ready to analyze this log event. Would you like me to extract IOCs, explain the error, or parse custom fields?
             </div>
           {/if}
           
           {#each chatHistory as msg}
-            <div class="p-3 rounded-lg border text-sm {msg.role === 'model' ? 'bg-purple-500/10 border-purple-500/30 text-purple-300' : 'bg-helios-surface-2 border-helios-border text-helios-text ml-4'}">
+            <div class="p-3 rounded-lg border text-sm {msg.role === 'model' ? 'bg-purple-500/10 border-purple-500/30 text-purple-700 dark:text-purple-300' : 'bg-helios-surface-2 border-helios-border text-helios-text ml-4'}">
               <strong class="{msg.role === 'model' ? 'text-purple-400' : 'text-helios-muted'} block mb-1 text-xs uppercase tracking-wider">
                 {msg.role === 'model' ? 'AI Assistant' : 'You'}
               </strong>
               {#if msg.role === 'model'}
-                <div class="prose prose-invert prose-sm max-w-none text-xs text-purple-300 prose-pre:bg-[#0a0a0f] prose-pre:border prose-pre:border-purple-500/30 prose-a:text-purple-400 prose-p:leading-relaxed prose-code:text-purple-200">
+                <div class="prose dark:prose-invert prose-sm max-w-none text-xs text-purple-700 dark:text-purple-300 prose-pre:bg-helios-surface-2 prose-pre:border prose-pre:border-purple-500/30 prose-a:text-purple-600 dark:prose-a:text-purple-400 prose-p:leading-relaxed prose-code:text-purple-800 dark:prose-code:text-purple-200">
                   {@html marked.parse(msg.text)}
                 </div>
               {:else}
